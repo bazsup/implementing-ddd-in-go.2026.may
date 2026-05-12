@@ -1,7 +1,7 @@
 package pricecalculation
 
 type DroppedFraction struct {
-	AmountKg     int
+	AmountKg     uint
 	FractionType string
 }
 

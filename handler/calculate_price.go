@@ -15,7 +15,7 @@ type calculatePriceRequest struct {
 }
 
 type droppedFraction struct {
-	AmountDropped int    `json:"amount_dropped"`
+	AmountDropped uint   `json:"amount_dropped"`
 	FractionType  string `json:"fraction_type"`
 }
 
@@ -39,8 +39,8 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 	var droppedFractions []pricecalculation.DroppedFraction
 	for _, fraction := range req.DroppedFractions {
 		droppedFraction := pricecalculation.DroppedFraction{
-			AmountKg: fraction.AmountDropped,
-			FractionType:  fraction.FractionType,
+			AmountKg:     fraction.AmountDropped,
+			FractionType: fraction.FractionType,
 		}
 		droppedFractions = append(droppedFractions, droppedFraction)
 	}
