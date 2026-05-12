@@ -3,6 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+
+	"implementing-ddd-in-go/pricecalculation"
 )
 
 type calculatePriceRequest struct {
@@ -33,11 +35,14 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID)
+	calculatedPrice := pricecalculation.CalculatePrice(visit)
+
 	resp := calculatePriceResponse{
-		PersonID:      req.PersonID,
-		VisitID:       req.VisitID,
-		PriceAmount:   1,
-		PriceCurrency: "USD",
+		PersonID:      calculatedPrice.PersonID,
+		VisitID:       calculatedPrice.VisitID,
+		PriceAmount:   calculatedPrice.PriceAmount,
+		PriceCurrency: calculatedPrice.PriceCurrency,
 	}
 
 	body, err := json.Marshal(resp)
