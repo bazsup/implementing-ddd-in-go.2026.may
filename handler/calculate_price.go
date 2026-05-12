@@ -31,6 +31,7 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 
 	var req calculatePriceRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		h.logger.Error().Err(err).Msg("failed to decode request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -47,6 +48,7 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 
 	body, err := json.Marshal(resp)
 	if err != nil {
+		h.logger.Error().Err(err).Msg("failed to marshal response")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -54,6 +56,7 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err = w.Write(body); err != nil {
+		h.logger.Error().Err(err).Msg("failed to write response")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
