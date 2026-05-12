@@ -38,10 +38,10 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 
 	var droppedFractions []pricecalculation.DroppedFraction
 	for _, fraction := range req.DroppedFractions {
-		droppedFraction := pricecalculation.DroppedFraction{
-			AmountKg:     fraction.AmountDropped,
-			FractionType: fraction.FractionType,
-		}
+		droppedFraction := pricecalculation.NewDroppedFraction(
+			fraction.FractionType,
+			pricecalculation.NewWeightFromKG(fraction.AmountDropped),
+		)
 		droppedFractions = append(droppedFractions, droppedFraction)
 	}
 	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID, droppedFractions)

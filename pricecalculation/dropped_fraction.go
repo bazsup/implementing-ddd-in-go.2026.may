@@ -6,10 +6,14 @@ var pricePerKg = map[string]Price{
 }
 
 type DroppedFraction struct {
-	AmountKg     uint
+	weight       Weight
 	FractionType string
 }
 
+func NewDroppedFraction(fractionType string, weight Weight) DroppedFraction {
+	return DroppedFraction{FractionType: fractionType, weight: weight}
+}
+
 func (df DroppedFraction) CalculatePrice() Price {
-	return pricePerKg[df.FractionType].Times(df.AmountKg)
+	return pricePerKg[df.FractionType].Times(df.weight.Amount())
 }
