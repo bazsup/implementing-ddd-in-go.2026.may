@@ -8,18 +8,18 @@ const ConstructionWaste = "Construction waste"
 const GreenWaste = "Green waste"
 
 var allowedFractionTypePrices = map[string]Price{
-	"Green waste":        NewPriceFromUSD(10),
-	"Construction waste": NewPriceFromUSD(15),
+	"Green waste":        NewPriceFromUSDcents(10),
+	"Construction waste": NewPriceFromUSDcents(15),
 }
 
 type FractionType struct {
-	fractionType string
-	price        Price
+	name  string
+	price Price
 }
 
 func NewFractionTypeFromString(fractionType string) (FractionType, error) {
 	if price, ok := allowedFractionTypePrices[fractionType]; ok {
-		return FractionType{fractionType: fractionType, price: price}, nil
+		return FractionType{name: fractionType, price: price}, nil
 	}
 	return FractionType{}, ErrUnknownFractionType
 }

@@ -8,7 +8,7 @@ type Price struct {
 	amountInSmallestUnit uint
 }
 
-func NewPriceFromUSD(amount uint) Price {
+func NewPriceFromUSDcents(amount uint) Price {
 	return Price{amountInSmallestUnit: amount}
 }
 
