@@ -28,3 +28,27 @@ func TestCalculatePrice_ForGreenWaste(t *testing.T) {
 	// assert
 	assert.Equal(t, 1.0, price.Amount())
 }
+
+func TestConstructionWasteFromString(t *testing.T) {
+	// act
+	_, err := pricecalculation.NewFractionTypeFromString(pricecalculation.ConstructionWaste)
+
+	// assert
+	assert.NoError(t, err)
+}
+
+func TestGreenWasteFromString(t *testing.T) {
+	// act
+	_, err := pricecalculation.NewFractionTypeFromString(pricecalculation.GreenWaste)
+
+	// assert
+	assert.NoError(t, err)
+}
+
+func TestUnknownFractionTypeFromString(t *testing.T) {
+	// act
+	_, err := pricecalculation.NewFractionTypeFromString("Special wast")
+
+	// assert
+	assert.EqualError(t, err, pricecalculation.ErrUnknownFractionType.Error())
+}
