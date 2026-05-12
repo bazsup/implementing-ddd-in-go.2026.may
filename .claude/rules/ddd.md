@@ -466,6 +466,26 @@ class Money {
 - Quantity, Weight, Temperature
 - PersonName, CompanyName
 
+**Validate domain values in constructors.** Invalid input returns an error — never silently accept bad state. Choose the right structure for the valid set:
+
+| Set size | Approach |
+|----------|----------|
+| 1 value | Direct comparison or `if` |
+| 2–5 values | Named slice + `slices.Contains` — names the concept, enables self-documenting error messages |
+| > 5 values | `map[string]bool` — O(1) lookup matters at this scale |
+
+```go
+// ✅ Named slice — valid set is an explicit domain concept
+var supportedCurrencies = []string{"USD"}
+
+func NewCurrency(value string) (Currency, error) {
+    if !slices.Contains(supportedCurrencies, value) {
+        return Currency{}, fmt.Errorf("unsupported currency %q, supported: %v", value, supportedCurrencies)
+    }
+    return Currency{value: value}, nil
+}
+```
+
 ---
 
 ## 9. Repositories are for loading and saving full aggregates
