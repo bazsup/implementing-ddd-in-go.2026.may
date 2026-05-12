@@ -5,24 +5,25 @@ import "errors"
 var InvalidPriceAmount = errors.New("invalid amount for price")
 
 type Price struct {
-	amount float64
+	amountInSmallestUnit uint
 }
 
-func NewPriceFromUSD(amount float64) (Price, error) {
-	if amount < 0 {
-		return Price{}, InvalidPriceAmount
-	}
-	return Price{amount: amount}, nil
+func NewPriceFromUSD(amount uint) Price {
+	return Price{amountInSmallestUnit: amount}
 }
 
 func (p Price) Amount() float64 {
-	return p.amount
+	return float64(p.amountInSmallestUnit) / 100
 }
 
-func (p Price) Add(other Price) (Price, error) {
-	return NewPriceFromUSD(p.amount + other.amount)
+func (p Price) Currency() string {
+	return "USD"
+}
+
+func (p Price) Add(other Price) Price {
+	return Price{p.amountInSmallestUnit + other.amountInSmallestUnit}
 }
 
 func (p Price) Equals(other Price) bool {
-	return p.amount == other.amount
+	return p.amountInSmallestUnit == other.amountInSmallestUnit
 }
