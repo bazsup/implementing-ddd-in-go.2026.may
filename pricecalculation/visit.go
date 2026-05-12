@@ -1,10 +1,5 @@
 package pricecalculation
 
-type DroppedFraction struct {
-	AmountKg     uint
-	FractionType string
-}
-
 type Visit struct {
 	personID         string
 	visitID          string
