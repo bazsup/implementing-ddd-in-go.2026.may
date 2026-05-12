@@ -1,9 +1,11 @@
 package pricecalculation
 
 import (
-	"fmt"
+	"errors"
 	"slices"
 )
+
+var InvalidCurrency = errors.New("invalid currency")
 
 var supportedCurrencies = []string{"USD"}
 
@@ -13,7 +15,7 @@ type Currency struct {
 
 func NewCurrency(value string) (Currency, error) {
 	if !slices.Contains(supportedCurrencies, value) {
-		return Currency{}, fmt.Errorf("unsupported currency %q, supported: %v", value, supportedCurrencies)
+		return Currency{}, InvalidCurrency
 	}
 	return Currency{value: value}, nil
 }
