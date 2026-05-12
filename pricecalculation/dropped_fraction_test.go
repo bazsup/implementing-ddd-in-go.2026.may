@@ -9,7 +9,9 @@ import (
 
 func TestCalculatePrice_ForConstructionWaste(t *testing.T) {
 	// arrange
-	droppedFraction := pricecalculation.NewDroppedFraction("Construction waste", pricecalculation.NewWeightFromKG(10))
+	fractionType, _ := pricecalculation.NewFractionTypeFromString(pricecalculation.ConstructionWaste)
+	weight := pricecalculation.NewWeightFromKG(10)
+	droppedFraction := pricecalculation.NewDroppedFraction(fractionType, weight)
 
 	// act
 	price := droppedFraction.CalculatePrice()
@@ -20,7 +22,9 @@ func TestCalculatePrice_ForConstructionWaste(t *testing.T) {
 
 func TestCalculatePrice_ForGreenWaste(t *testing.T) {
 	// arrange
-	droppedFraction := pricecalculation.NewDroppedFraction("Green waste", pricecalculation.NewWeightFromKG(10))
+	fractionType, _ := pricecalculation.NewFractionTypeFromString(pricecalculation.GreenWaste)
+	weight := pricecalculation.NewWeightFromKG(10)
+	droppedFraction := pricecalculation.NewDroppedFraction(fractionType, weight)
 
 	// act
 	price := droppedFraction.CalculatePrice()

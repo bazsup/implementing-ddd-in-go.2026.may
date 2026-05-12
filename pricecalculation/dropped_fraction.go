@@ -26,13 +26,13 @@ func NewFractionTypeFromString(fractionType string) (FractionType, error) {
 
 type DroppedFraction struct {
 	weight       Weight
-	FractionType string
+	FractionType FractionType
 }
 
-func NewDroppedFraction(fractionType string, weight Weight) DroppedFraction {
+func NewDroppedFraction(fractionType FractionType, weight Weight) DroppedFraction {
 	return DroppedFraction{FractionType: fractionType, weight: weight}
 }
 
 func (df DroppedFraction) CalculatePrice() Price {
-	return allowedFractionTypePrices[df.FractionType].Times(df.weight.Amount())
+	return df.FractionType.price.Times(df.weight.Amount())
 }
