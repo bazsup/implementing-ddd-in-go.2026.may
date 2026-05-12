@@ -36,3 +36,10 @@ func TestPrice_Add(t *testing.T) {
 	
 	assert.Equal(t, 7.35, sum.Amount())
 }
+
+func TestPrice_Times(t *testing.T) {
+	price := pricecalculation.NewPriceFromUSD(150)
+	result := price.Times(2)
+	
+	assert.Equal(t, 3.00, result.Amount())
+}

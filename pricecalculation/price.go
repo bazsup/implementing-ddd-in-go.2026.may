@@ -24,6 +24,10 @@ func (p Price) Add(other Price) Price {
 	return Price{p.amountInSmallestUnit + other.amountInSmallestUnit}
 }
 
+func (p Price) Times(factor uint) Price {
+	return Price{p.amountInSmallestUnit * factor}
+}
+
 func (p Price) Equals(other Price) bool {
 	return p.amountInSmallestUnit == other.amountInSmallestUnit
 }
