@@ -1,4 +1,4 @@
-package pricecalculation
+package domain
 
 import "errors"
 

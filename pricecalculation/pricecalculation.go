@@ -1,5 +1,7 @@
 package pricecalculation
 
+import "implementing-ddd-in-go/pricecalculation/domain"
+
 type CalculatedPrice struct {
 	PersonID      string
 	VisitID       string
@@ -8,7 +10,7 @@ type CalculatedPrice struct {
 }
 
 func CalculatePrice(visit Visit) CalculatedPrice {
-	var total Price
+	var total domain.Price
 	for _, df := range visit.droppedFractions {
 		total = total.Add(df.CalculatePrice())
 	}

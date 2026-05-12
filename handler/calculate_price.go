@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"implementing-ddd-in-go/pricecalculation"
+	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
 type calculatePriceRequest struct {
@@ -36,17 +37,17 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var droppedFractions []pricecalculation.DroppedFraction
+	var droppedFractions []domain.DroppedFraction
 	for _, fraction := range req.DroppedFractions {
-		fractionType, err := pricecalculation.NewFractionTypeFromString(fraction.FractionType)
+		fractionType, err := domain.NewFractionTypeFromString(fraction.FractionType)
 		if err != nil {
 			h.logger.Error().Msg(err.Error())
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		weight := pricecalculation.NewWeightFromKG(fraction.AmountDropped)
-		droppedFraction := pricecalculation.NewDroppedFraction(fractionType, weight)
+		weight := domain.NewWeightFromKG(fraction.AmountDropped)
+		droppedFraction := domain.NewDroppedFraction(fractionType, weight)
 		droppedFractions = append(droppedFractions, droppedFraction)
 	}
 	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID, droppedFractions)
