@@ -1,0 +1,8 @@
+# Binary
+server
+
+# Environment
+.env
+
+# macOS
+.DS_Store
