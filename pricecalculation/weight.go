@@ -4,8 +4,8 @@ type Weight struct {
 	kilograms uint
 }
 
-func NewWeightFromKG(kilograms uint) (Weight, error) {
-	return Weight{kilograms: kilograms}, nil
+func NewWeightFromKG(kilograms uint) Weight {
+	return Weight{kilograms: kilograms}
 }
 
 func (w Weight) Amount() uint {
