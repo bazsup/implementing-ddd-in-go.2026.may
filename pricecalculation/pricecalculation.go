@@ -11,7 +11,7 @@ func CalculatePrice(visit Visit) CalculatedPrice {
 	return CalculatedPrice{
 		PersonID:      visit.personID,
 		VisitID:       visit.visitID,
-		PriceAmount:   1,
+		PriceAmount:   0,
 		PriceCurrency: "USD",
 	}
 }
