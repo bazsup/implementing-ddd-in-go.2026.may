@@ -36,7 +36,15 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID)
+	var droppedFractions []pricecalculation.DroppedFraction
+	for _, fraction := range req.DroppedFractions {
+		droppedFraction := pricecalculation.DroppedFraction{
+			AmountKg: fraction.AmountDropped,
+			FractionType:  fraction.FractionType,
+		}
+		droppedFractions = append(droppedFractions, droppedFraction)
+	}
+	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID, droppedFractions)
 	calculatedPrice := pricecalculation.CalculatePrice(visit)
 
 	resp := calculatePriceResponse{

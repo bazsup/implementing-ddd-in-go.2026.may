@@ -1,10 +1,16 @@
 package pricecalculation
 
-type Visit struct {
-	personID string
-	visitID  string
+type DroppedFraction struct {
+	AmountKg     int
+	FractionType string
 }
 
-func NewVisit(personID, visitID string) Visit {
-	return Visit{personID: personID, visitID: visitID}
+type Visit struct {
+	personID         string
+	visitID          string
+	droppedFractions []DroppedFraction
+}
+
+func NewVisit(personID, visitID string, droppedFractions []DroppedFraction) Visit {
+	return Visit{personID: personID, visitID: visitID, droppedFractions: droppedFractions}
 }
