@@ -15,7 +15,7 @@ type CalculatedPrice struct {
 func CalculatePrice(visit Visit) CalculatedPrice {
 	var total float64
 	for _, f := range visit.droppedFractions {
-		total += float64(f.AmountKg) * pricePerKg[f.FractionType].Amount()
+		total += pricePerKg[f.FractionType].Times(f.AmountKg).Amount()
 	}
 	return CalculatedPrice{
 		PersonID:      visit.personID,
