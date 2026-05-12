@@ -18,10 +18,6 @@ func NewCurrency(value string) (Currency, error) {
 	return Currency{value: value}, nil
 }
 
-func (c Currency) String() string {
-	return c.value
-}
-
 func (c Currency) Equals(other Currency) bool {
 	return c.value == other.value
 }

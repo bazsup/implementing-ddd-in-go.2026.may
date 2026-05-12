@@ -1,9 +1,6 @@
 package pricecalculation
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 type Price struct {
 	amount   float64
@@ -20,10 +17,6 @@ func (p Price) Amount() float64 {
 
 func (p Price) Currency() Currency {
 	return p.currency
-}
-
-func (p Price) String() string {
-	return fmt.Sprintf("%.2f %s", p.amount, p.currency)
 }
 
 func (p Price) Add(other Price) (Price, error) {

@@ -23,9 +23,3 @@ func TestPrice_Equals_DifferentAmount(t *testing.T) {
 func TestPrice_Add(t *testing.T) {
 	t.Skip("implement me")
 }
-
-func TestPrice_String(t *testing.T) {
-	t.Skip("implement me")
-}
-
-
