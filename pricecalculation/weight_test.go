@@ -9,11 +9,6 @@ import (
 	"implementing-ddd-in-go/pricecalculation"
 )
 
-func TestNewWeight_BelowZero(t *testing.T) {
-	_, err := pricecalculation.NewWeightFromKG(-1)
-	assert.EqualError(t, err, pricecalculation.InvalidWeight.Error())
-}
-
 func TestNewWeight_Zero(t *testing.T) {
 	_, err := pricecalculation.NewWeightFromKG(0)
 	require.NoError(t, err)

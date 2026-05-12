@@ -1,21 +1,14 @@
 package pricecalculation
 
-import "errors"
-
-var InvalidWeight = errors.New("weight amount must not be negative")
-
 type Weight struct {
-	kilograms int
+	kilograms uint
 }
 
-func NewWeightFromKG(kilograms int) (Weight, error) {
-	if kilograms < 0 {
-		return Weight{}, InvalidWeight
-	}
+func NewWeightFromKG(kilograms uint) (Weight, error) {
 	return Weight{kilograms: kilograms}, nil
 }
 
-func (w Weight) Amount() int {
+func (w Weight) Amount() uint {
 	return w.kilograms
 }
 
