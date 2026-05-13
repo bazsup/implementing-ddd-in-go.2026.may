@@ -1,6 +1,10 @@
 package pricecalculation
 
-import "implementing-ddd-in-go/pricecalculation/domain"
+import (
+	"time"
+
+	"implementing-ddd-in-go/pricecalculation/domain"
+)
 
 type ForGettingVisitorByID func(id string) (domain.ExternalVisitor, error)
 
@@ -18,14 +22,20 @@ type CalculatedPrice struct {
 
 type PriceCalculator struct {
 	getExternalVisitorByID ForGettingVisitorByID
+	visitHistory           *domain.VisitHistory
 }
 
-func NewPriceCalculator(getExternalVisitorByID ForGettingVisitorByID) PriceCalculator {
-	return PriceCalculator{getExternalVisitorByID}
+func NewPriceCalculator(getExternalVisitorByID ForGettingVisitorByID, visitHistory *domain.VisitHistory) PriceCalculator {
+	return PriceCalculator{getExternalVisitorByID, visitHistory}
 }
 
-func (c PriceCalculator) CalculatePrice(personID, visitID string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
+func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
 	visitor, err := c.getExternalVisitorByID(personID)
+	if err != nil {
+		return CalculatedPrice{}, err
+	}
+
+	parsedDate, err := time.Parse(time.DateOnly, date)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
@@ -43,6 +53,12 @@ func (c PriceCalculator) CalculatePrice(personID, visitID string, fractions []Ra
 	for _, df := range droppedFractions {
 		total = total.Add(df.CalculatePrice())
 	}
+
+	c.visitHistory.Add(domain.NewVisit(personID, parsedDate))
+	if c.visitHistory.NumberOfVisitsInMonthOfLastVisit(personID) >= 3 {
+		total = total.AddFee(5)
+	}
+
 	return CalculatedPrice{
 		PersonID:      personID,
 		VisitID:       visitID,

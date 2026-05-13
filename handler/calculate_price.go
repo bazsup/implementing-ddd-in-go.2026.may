@@ -41,8 +41,8 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		fractions = append(fractions, pricecalculation.RawDroppedFraction{Type: f.FractionType, AmountKG: f.AmountDropped})
 	}
 
-	priceCalculator := pricecalculation.NewPriceCalculator(h.getVisitorByID)
-	calculatedPrice, err := priceCalculator.CalculatePrice(req.PersonID, req.VisitID, fractions)
+	priceCalculator := pricecalculation.NewPriceCalculator(h.getVisitorByID, h.visitHistory)
+	calculatedPrice, err := priceCalculator.CalculatePrice(req.PersonID, req.VisitID, req.Date, fractions)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to calculate price")
 		http.Error(w, err.Error(), http.StatusInternalServerError)

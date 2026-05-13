@@ -24,7 +24,7 @@ func main() {
 	context := pricecalculation.NewContext(logger)
 	reinitialContext := func() { context.Initialize(externalVisitors.GetVisitorByID) }
 
-	h := handler.NewHandler(logger, reinitialContext, externalVisitors.GetVisitorByID)
+	h := handler.NewHandler(logger, reinitialContext, externalVisitors.GetVisitorByID, context.VisitHistory)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", h.Status)
