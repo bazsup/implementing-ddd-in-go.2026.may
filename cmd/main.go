@@ -10,6 +10,7 @@ import (
 	"implementing-ddd-in-go/handler"
 	"implementing-ddd-in-go/infrastructure"
 	"implementing-ddd-in-go/pricecalculation"
+	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 		externalVisitors.GetVisitorByID,
 		visitHistories.GetByPersonID,
 		visitHistories.Save,
+		domain.DefaultFractionPricingPolicy,
 	)
 
 	mux := http.NewServeMux()

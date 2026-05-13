@@ -8,16 +8,16 @@ import (
 var ErrInvalidDateForVisit = errors.New("invalid date given for Visit")
 
 type Visit struct {
-	personId string
-	date     time.Time
+	date    time.Time
+	visitor ExternalVisitor
 }
 
-func NewVisit(personId string, date string) (Visit, error) {
-	visitDate, dateErr := time.Parse(time.DateOnly, date)
-	if dateErr != nil {
+func NewVisit(date string, visitor ExternalVisitor) (Visit, error) {
+	visitDate, err := time.Parse(time.DateOnly, date)
+	if err != nil {
 		return Visit{}, ErrInvalidDateForVisit
 	}
-	return Visit{personId: personId, date: visitDate}, nil
+	return Visit{date: visitDate, visitor: visitor}, nil
 }
 
 func (v Visit) inSameMonth(other Visit) bool {
@@ -27,9 +27,13 @@ func (v Visit) inSameMonth(other Visit) bool {
 }
 
 func (v Visit) PersonId() string {
-	return v.personId
+	return v.visitor.ID()
 }
 
 func (v Visit) Date() time.Time {
 	return v.date
+}
+
+func (v Visit) Visitor() ExternalVisitor {
+	return v.visitor
 }

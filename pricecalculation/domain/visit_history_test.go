@@ -16,25 +16,21 @@ func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
-	// arrange
 	history := NewVisitHistory("test-person")
-	lastMonth := "2026-04-01"
-	thisMonth := "2026-05-01"
+	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "test-person", "addr", "Pineville")
 
-	previousVisit, err := NewVisit("person-1", lastMonth)
+	previousVisit, err := NewVisit("2026-04-01", visitor)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
-	currentVisit, err := NewVisit("person-1", thisMonth)
+	currentVisit, err := NewVisit("2026-05-01", visitor)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
 	history.Add(previousVisit)
 	history.Add(currentVisit)
 	history.Add(currentVisit)
 
-	// act
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
-	// assert
 	assert.Equal(t, 2, count)
 }
 
@@ -50,72 +46,80 @@ func businessCustomerFeePolicy() FeePolicy {
 
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
 	history := NewVisitHistory("person-1")
-	visit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
+	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
+	visit, _ := NewVisit("2026-05-14", visitor)
+	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(visit, fractions, privateCustomerFeePolicy())
+	price, err := history.CalculatePriceOfVisit(visit, fractions, privateCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
+	assert.NoError(t, err)
 	assert.Equal(t, NewPriceFromUSDcents(100), price)
 }
 
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
 	history := NewVisitHistory("person-1")
-	previousVisit1, _ := NewVisit("person-1", "2026-04-01")
-	previousVisit2, _ := NewVisit("person-1", "2026-04-15")
+	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
+	previousVisit1, _ := NewVisit("2026-04-01", visitor)
+	previousVisit2, _ := NewVisit("2026-04-15", visitor)
 	history.Add(previousVisit1)
 	history.Add(previousVisit2)
 
-	currentVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
+	currentVisit, _ := NewVisit("2026-05-14", visitor)
+	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(currentVisit, fractions, privateCustomerFeePolicy())
+	price, err := history.CalculatePriceOfVisit(currentVisit, fractions, privateCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
+	assert.NoError(t, err)
 	assert.Equal(t, NewPriceFromUSDcents(100), price)
 }
 
 func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAdditionalFee5Percent(t *testing.T) {
 	history := NewVisitHistory("person-1")
-	visit1, _ := NewVisit("person-1", "2026-05-01")
-	visit2, _ := NewVisit("person-1", "2026-05-07")
+	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
+	visit1, _ := NewVisit("2026-05-01", visitor)
+	visit2, _ := NewVisit("2026-05-07", visitor)
 	history.Add(visit1)
 	history.Add(visit2)
 
-	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
+	thirdVisit, _ := NewVisit("2026-05-14", visitor)
+	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(thirdVisit, fractions, privateCustomerFeePolicy())
+	price, err := history.CalculatePriceOfVisit(thirdVisit, fractions, privateCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
+	assert.NoError(t, err)
 	assert.Equal(t, NewPriceFromUSDcents(105), price)
 }
 
 func TestCalculatePriceOfVisit_BusinessCustomerHasNoAdditionalFeeOnThirdVisitThisMonth(t *testing.T) {
 	history := NewVisitHistory("person-1")
-	visit1, _ := NewVisit("person-1", "2026-05-01")
-	visit2, _ := NewVisit("person-1", "2026-05-07")
+	visitor, _ := NewExternalVisitor("business", "person-1", "Pine Street 1", "Pineville")
+	visit1, _ := NewVisit("2026-05-01", visitor)
+	visit2, _ := NewVisit("2026-05-07", visitor)
 	history.Add(visit1)
 	history.Add(visit2)
 
-	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "business")
+	thirdVisit, _ := NewVisit("2026-05-14", visitor)
+	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(thirdVisit, fractions, businessCustomerFeePolicy())
+	price, err := history.CalculatePriceOfVisit(thirdVisit, fractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
+	assert.NoError(t, err)
 	assert.Equal(t, NewPriceFromUSDcents(120), price)
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
 	history := NewVisitHistory("test-person")
+	visitor1, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "addr", "Pineville")
+	visitor2, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-2", "addr", "Pineville")
 
-	thisMonth := "2026-05-01"
-
-	visitID1, err := NewVisit("person-1", thisMonth)
+	visitID1, err := NewVisit("2026-05-01", visitor1)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
-	visitID2, err := NewVisit("person-2", thisMonth)
+	visitID2, err := NewVisit("2026-05-01", visitor2)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
 	history.Add(visitID1)

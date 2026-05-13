@@ -13,7 +13,7 @@ func TestCalculatePrice_ForABusinessCustomerFromPineville(t *testing.T) {
 	getVisitor := func(id string) (domain.ExternalVisitor, error) {
 		return domain.NewExternalVisitor("business", id, "Pine Street 1", "Pineville")
 	}
-	calculator := pricecalculation.NewPriceCalculator(getVisitor, emptyVisitHistory, noopSaveVisitHistory)
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-1", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -32,7 +32,7 @@ func TestCalculatePrice_ForAPrivateCustomerFromOakCity(t *testing.T) {
 	getVisitor := func(id string) (domain.ExternalVisitor, error) {
 		return domain.NewExternalVisitor("private", id, "Oak Avenue 2", "Oak City")
 	}
-	calculator := pricecalculation.NewPriceCalculator(getVisitor, emptyVisitHistory, noopSaveVisitHistory)
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
 
 	result, err := calculator.CalculatePrice("person-2", "visit-2", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -52,14 +52,15 @@ func TestCalculatePrice_WithAdditionalFeeFor3VisitsInOneMonth(t *testing.T) {
 		return domain.NewExternalVisitor("private", id, "Pine Street 1", "Pineville")
 	}
 	getVisitHistory := func(id string) *domain.VisitHistory {
+		visitor, _ := domain.NewExternalVisitor("private", id, "Pine Street 1", "Pineville")
 		history := domain.NewVisitHistory(id)
-		visit1, _ := domain.NewVisit(id, "2026-05-01")
-		visit2, _ := domain.NewVisit(id, "2026-05-07")
+		visit1, _ := domain.NewVisit("2026-05-01", visitor)
+		visit2, _ := domain.NewVisit("2026-05-07", visitor)
 		history.Add(visit1)
 		history.Add(visit2)
 		return history
 	}
-	calculator := pricecalculation.NewPriceCalculator(getVisitor, getVisitHistory, noopSaveVisitHistory)
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-3", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -75,14 +76,15 @@ func TestCalculatePrice_BusinessCustomerHasNoAdditionalFeeFor3VisitsInOneMonth(t
 		return domain.NewExternalVisitor("business", id, "Pine Street 1", "Pineville")
 	}
 	getVisitHistory := func(id string) *domain.VisitHistory {
+		visitor, _ := domain.NewExternalVisitor("business", id, "Pine Street 1", "Pineville")
 		history := domain.NewVisitHistory(id)
-		visit1, _ := domain.NewVisit(id, "2026-05-01")
-		visit2, _ := domain.NewVisit(id, "2026-05-07")
+		visit1, _ := domain.NewVisit("2026-05-01", visitor)
+		visit2, _ := domain.NewVisit("2026-05-07", visitor)
 		history.Add(visit1)
 		history.Add(visit2)
 		return history
 	}
-	calculator := pricecalculation.NewPriceCalculator(getVisitor, getVisitHistory, noopSaveVisitHistory)
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-3", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},

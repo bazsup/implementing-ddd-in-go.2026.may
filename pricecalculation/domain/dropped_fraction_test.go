@@ -27,11 +27,12 @@ func TestCalculatePrice(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
-			fractionType, _ := domain.NewFractionTypeFromString(tt.fractionType, tt.city, tt.customerType)
+			ft, _ := domain.NewFractionTypeFromString(tt.fractionType)
+			calc, _ := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType)
 			weight := domain.NewWeightFromKG(tt.weightKG)
-			droppedFraction := domain.NewDroppedFraction(fractionType, weight)
+			droppedFraction := domain.NewDroppedFraction(ft, weight)
 
-			price := droppedFraction.CalculatePrice()
+			price := calc.CalculatePrice(droppedFraction)
 
 			assert.Equal(t, tt.expectedAmount, price.Amount())
 		})
@@ -39,6 +40,25 @@ func TestCalculatePrice(t *testing.T) {
 }
 
 func TestNewFractionTypeFromString(t *testing.T) {
+	tests := []struct {
+		fractionType string
+		expectedErr  error
+	}{
+		{domain.ConstructionWaste, nil},
+		{domain.GreenWaste, nil},
+		{"Special waste", domain.ErrUnknownFractionType},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.fractionType, func(t *testing.T) {
+			_, err := domain.NewFractionTypeFromString(tt.fractionType)
+
+			assert.Equal(t, tt.expectedErr, err)
+		})
+	}
+}
+
+func TestFractionPricingPolicy_CalculatorFor(t *testing.T) {
 	tests := []struct {
 		fractionType string
 		city         string
@@ -53,15 +73,13 @@ func TestNewFractionTypeFromString(t *testing.T) {
 		{domain.GreenWaste, "Pineville", "business", nil},
 		{domain.ConstructionWaste, "Oak City", "business", nil},
 		{domain.GreenWaste, "Oak City", "business", nil},
-		{"Special waste", "Pineville", "private", domain.ErrUnknownFractionType},
-		{"Special waste", "Oak City", "private", domain.ErrUnknownFractionType},
-		{domain.GreenWaste, "Unknown City", "private", domain.ErrUnknownCity},
-		{domain.GreenWaste, "Pineville", "unknown", domain.ErrUnknownCustomerType},
+		{domain.GreenWaste, "Unknown City", "private", domain.ErrUnknownFractionType},
+		{domain.GreenWaste, "Pineville", "unknown", domain.ErrUnknownFractionType},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
-			_, err := domain.NewFractionTypeFromString(tt.fractionType, tt.city, tt.customerType)
+			_, err := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType)
 
 			assert.Equal(t, tt.expectedErr, err)
 		})

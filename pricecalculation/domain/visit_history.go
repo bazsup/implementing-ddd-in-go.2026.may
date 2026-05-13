@@ -38,13 +38,17 @@ func (vh *VisitHistory) lastVisit() Visit {
 	return vh.visits[len(vh.visits)-1]
 }
 
-func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction, feePolicy FeePolicy) Price {
+func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction, feePolicy FeePolicy, fractionPricingPolicy FractionPricingPolicy) (Price, error) {
 	vh.Add(visit)
 	var total Price
 	for _, df := range droppedFractions {
-		total = total.Add(df.CalculatePrice())
+		calc, err := fractionPricingPolicy.CalculatorFor(df.fractionType.name, visit.visitor.City(), visit.visitor.Type())
+		if err != nil {
+			return Price{}, err
+		}
+		total = total.Add(calc.CalculatePrice(df))
 	}
-	return feePolicy.AddFee(vh, total)
+	return feePolicy.AddFee(vh, total), nil
 }
 
 func (vh *VisitHistory) Reset() {

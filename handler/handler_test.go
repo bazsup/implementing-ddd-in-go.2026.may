@@ -16,3 +16,5 @@ var dummyGetVisitHistoryByPersonID = func(id string) *domain.VisitHistory {
 }
 
 var dummySaveVisitHistory = func(*domain.VisitHistory) {}
+
+var dummyFractionPricingPolicy = domain.DefaultFractionPricingPolicy

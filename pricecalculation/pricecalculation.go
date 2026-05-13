@@ -25,14 +25,16 @@ type PriceCalculator struct {
 	getExternalVisitorByID    ForGettingVisitorByID
 	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID
 	saveVisitHistory          ForSavingVisitHistories
+	fractionPricingPolicy     domain.FractionPricingPolicy
 }
 
 func NewPriceCalculator(
 	getExternalVisitorByID ForGettingVisitorByID,
 	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID,
 	saveVisitHistory ForSavingVisitHistories,
+	fractionPricingPolicy domain.FractionPricingPolicy,
 ) PriceCalculator {
-	return PriceCalculator{getExternalVisitorByID, getVisitHistoryByPersonID, saveVisitHistory}
+	return PriceCalculator{getExternalVisitorByID, getVisitHistoryByPersonID, saveVisitHistory, fractionPricingPolicy}
 }
 
 func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
@@ -43,20 +45,23 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 
 	var droppedFractions []domain.DroppedFraction
 	for _, f := range fractions {
-		ft, err := domain.NewFractionTypeFromString(f.Type, visitor.City(), visitor.Type())
+		ft, err := domain.NewFractionTypeFromString(f.Type)
 		if err != nil {
 			return CalculatedPrice{}, err
 		}
 		droppedFractions = append(droppedFractions, domain.NewDroppedFraction(ft, domain.NewWeightFromKG(f.AmountKG)))
 	}
 
-	visit, err := domain.NewVisit(personID, date)
+	visit, err := domain.NewVisit(date, visitor)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
 
 	visitHistory := c.getVisitHistoryByPersonID(personID)
-	total := visitHistory.CalculatePriceOfVisit(visit, droppedFractions, domain.NewFeePolicy(visitor))
+	total, err := visitHistory.CalculatePriceOfVisit(visit, droppedFractions, domain.NewFeePolicy(visitor), c.fractionPricingPolicy)
+	if err != nil {
+		return CalculatedPrice{}, err
+	}
 	c.saveVisitHistory(visitHistory)
 
 	return CalculatedPrice{
