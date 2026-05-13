@@ -1,0 +1,1221 @@
+{
+  "info": {
+    "name": "implementing-ddd",
+    "_postman_id": "implementing-ddd-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "session-1-no-fractions",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "no fractions - calculatePrice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(0);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Bald Eagle\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [],\n  \"person_id\": \"Bald Eagle\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-1-some-fractions",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "some fractions - calculatePrice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(7.35);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Bald Eagle\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 15,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 39,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Bald Eagle\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-2-some-fractions-in-oak-city",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "some fractions - calculatePrice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(10.06);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 83,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 18,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-2.5-additional-fee-when-3-deliveries-or-more-in-same-month",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(10.06);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 83,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 18,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "second visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(9.31);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"2\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-24\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 49,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "third visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(8.65);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"3\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-25\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 103,\n      \"fraction_type\": \"Green waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"3\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-2.5-complex-scenario",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(10.06);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 83,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 18,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "second visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(9.31);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"2\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-24\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 49,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit - another person",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(1.5);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Bald Eagle\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"3\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-24\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 10,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Bald Eagle\",\n  \"visit_id\": \"3\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "third visit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(8.65);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"4\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-25\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 103,\n      \"fraction_type\": \"Green waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"4\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit - next month",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(2.64);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Squirrel Gus\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"5\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-08-12\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 33,\n      \"fraction_type\": \"Green waste\"\n    }\n  ],\n  \"person_id\": \"Squirrel Gus\",\n  \"visit_id\": \"5\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-3-business-customers",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "business customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(10.42);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 83,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 18,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "another business customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(42.21);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Bear Billy\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"2\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-09-30\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 134,\n      \"fraction_type\": \"Green waste\"\n    },\n    {\n      \"amount_dropped\": 201,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Bear Billy\",\n  \"visit_id\": \"2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-3-tier-based-pricing",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit - Beaver Bertha 597kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(125.37);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 597,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "second visit - Beaver Bertha 1803kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(490.63);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"2\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 1803,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "third visit - Peppa Python 1228kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(276.12);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Peppa Python\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"3\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 1228,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Peppa Python\",\n  \"visit_id\": \"3\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "fourth visit - Beaver Bertha 901kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(261.29);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"4\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-25\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 901,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"4\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "fifth visit - Beaver Bertha 600kg new year",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(126);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"5\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2024-01-15\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 600,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"5\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-4-business-exemption-per-business",
+      "item": [
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "first visit - Beaver Bertha 597kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(125.37);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bertha\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"1\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 597,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bertha\",\n  \"visit_id\": \"1\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "second visit - Beaver Bruce 1803kg",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Response should have the correct price amount calculated for dropped fractions\", function() {",
+                  "  pm.expect(data.price_amount).to.equal(490.63);",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct person ID\", function() {",
+                  "  pm.expect(data.person_id).to.equal(\"Beaver Bruce\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct visit ID\", function() {",
+                  "  pm.expect(data.visit_id).to.equal(\"2\");",
+                  "});",
+                  "",
+                  "pm.test(\"Response should have the correct currency\", function() {",
+                  "  pm.expect(data.price_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2023-07-23\",\n  \"dropped_fractions\": [\n    {\n      \"amount_dropped\": 1803,\n      \"fraction_type\": \"Construction waste\"\n    }\n  ],\n  \"person_id\": \"Beaver Bruce\",\n  \"visit_id\": \"2\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/calculatePrice",
+              "host": ["{{baseUrl}}"],
+              "path": ["calculatePrice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "session-5-send-invoice-after-payment",
+      "item": [
+        {
+          "name": "reset invoice-inspector",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{invoiceUrl}}/api/invoice-inspector/reset",
+              "host": ["{{invoiceUrl}}"],
+              "path": ["api", "invoice-inspector", "reset"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "startScenario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/startScenario",
+              "host": ["{{baseUrl}}"],
+              "path": ["startScenario"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "calculate price for business visitor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"beavers@dam-building.com\",\n  \"invoice_amount\": 125.37,\n  \"invoice_currency\": \"USD\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{invoiceUrl}}/api/invoice",
+              "host": ["{{invoiceUrl}}"],
+              "path": ["api", "invoice"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "check invoice-inspector",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "",
+                  "pm.test(\"Invoice request should have the correct invoice amount \", function() {",
+                  "  pm.expect(data.body.invoice_amount).to.equal(125.37);",
+                  "});",
+                  "",
+                  "pm.test(\"Invoice request should have the correct invoice currency \", function() {",
+                  "  pm.expect(data.body.invoice_currency).to.equal(\"USD\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{invoiceUrl}}/api/invoice-inspector/beavers@dam-building.com",
+              "host": ["{{invoiceUrl}}"],
+              "path": ["api", "invoice-inspector", "beavers@dam-building.com"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "invoice",
+      "item": [
+        {
+          "name": "send invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"beavers@dam-building.com\",\n  \"invoice_amount\": 125.37,\n  \"invoice_currency\": \"USD\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{invoiceUrl}}/api/invoice",
+              "host": ["{{invoiceUrl}}"],
+              "path": ["api", "invoice"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
