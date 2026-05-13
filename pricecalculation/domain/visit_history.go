@@ -1,5 +1,7 @@
 package domain
 
+const additionalFeeOn3rdVisitPerMonthPercentage = uint(5)
+
 type VisitHistory struct {
 	personId string
 	visits   []Visit
@@ -45,7 +47,7 @@ func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []Dr
 		total = total.Add(df.CalculatePrice())
 	}
 	if vh.NumberOfVisitsInMonthOfLastVisit() >= 3 {
-		total = total.AddFee(5)
+		total = total.AddFee(additionalFeeOn3rdVisitPerMonthPercentage)
 	}
 	return total
 }
