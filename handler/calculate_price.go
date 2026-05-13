@@ -36,9 +36,9 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var fractions []pricecalculation.FractionInput
+	var fractions []pricecalculation.RawDroppedFraction
 	for _, f := range req.DroppedFractions {
-		fractions = append(fractions, pricecalculation.FractionInput{Type: f.FractionType, AmountKG: f.AmountDropped})
+		fractions = append(fractions, pricecalculation.RawDroppedFraction{Type: f.FractionType, AmountKG: f.AmountDropped})
 	}
 
 	priceCalculator := pricecalculation.NewPriceCalculator(h.getVisitorByID)

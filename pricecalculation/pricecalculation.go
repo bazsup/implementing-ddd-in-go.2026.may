@@ -4,7 +4,7 @@ import "implementing-ddd-in-go/pricecalculation/domain"
 
 type ForGettingVisitorByID func(id string) (domain.ExternalVisitor, error)
 
-type FractionInput struct {
+type RawDroppedFraction struct {
 	Type     string
 	AmountKG uint
 }
@@ -24,7 +24,7 @@ func NewPriceCalculator(getExternalVisitorByID ForGettingVisitorByID) PriceCalcu
 	return PriceCalculator{getExternalVisitorByID}
 }
 
-func (c PriceCalculator) CalculatePrice(personID, visitID string, fractions []FractionInput) (CalculatedPrice, error) {
+func (c PriceCalculator) CalculatePrice(personID, visitID string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
 	visitor, err := c.getExternalVisitorByID(personID)
 	if err != nil {
 		return CalculatedPrice{}, err
@@ -39,15 +39,13 @@ func (c PriceCalculator) CalculatePrice(personID, visitID string, fractions []Fr
 		droppedFractions = append(droppedFractions, domain.NewDroppedFraction(ft, domain.NewWeightFromKG(f.AmountKG)))
 	}
 
-	visit := NewVisit(personID, visitID, droppedFractions)
-
 	var total domain.Price
-	for _, df := range visit.droppedFractions {
+	for _, df := range droppedFractions {
 		total = total.Add(df.CalculatePrice())
 	}
 	return CalculatedPrice{
-		PersonID:      visit.personID,
-		VisitID:       visit.visitID,
+		PersonID:      personID,
+		VisitID:       visitID,
 		PriceAmount:   total.Amount(),
 		PriceCurrency: total.Currency(),
 	}, nil
