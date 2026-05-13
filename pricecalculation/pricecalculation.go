@@ -43,7 +43,7 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 
 	var droppedFractions []domain.DroppedFraction
 	for _, f := range fractions {
-		ft, err := domain.NewFractionTypeFromString(f.Type, visitor.City())
+		ft, err := domain.NewFractionTypeFromString(f.Type, visitor.City(), visitor.Type())
 		if err != nil {
 			return CalculatedPrice{}, err
 		}

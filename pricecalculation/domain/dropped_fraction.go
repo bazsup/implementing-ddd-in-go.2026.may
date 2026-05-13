@@ -4,18 +4,31 @@ import "errors"
 
 var ErrUnknownFractionType = errors.New("fraction type not known")
 var ErrUnknownCity = errors.New("city not known")
+var ErrUnknownCustomerType = errors.New("customer type not known")
 
 const ConstructionWaste = "Construction waste"
 const GreenWaste = "Green waste"
 
-var cityFractionPrices = map[string]map[string]Price{
-	"Pineville": {
-		GreenWaste:        NewPriceFromUSDcents(10),
-		ConstructionWaste: NewPriceFromUSDcents(15),
+var fractionPrices = map[string]map[string]map[string]Price{
+	"private": {
+		"Pineville": {
+			GreenWaste:        NewPriceFromUSDcents(10),
+			ConstructionWaste: NewPriceFromUSDcents(15),
+		},
+		"Oak City": {
+			GreenWaste:        NewPriceFromUSDcents(8),
+			ConstructionWaste: NewPriceFromUSDcents(19),
+		},
 	},
-	"Oak City": {
-		GreenWaste:        NewPriceFromUSDcents(8),
-		ConstructionWaste: NewPriceFromUSDcents(19),
+	"business": {
+		"Pineville": {
+			GreenWaste:        NewPriceFromUSDcents(12),
+			ConstructionWaste: NewPriceFromUSDcents(13),
+		},
+		"Oak City": {
+			GreenWaste:        NewPriceFromUSDcents(8),
+			ConstructionWaste: NewPriceFromUSDcents(21),
+		},
 	},
 }
 
@@ -24,12 +37,16 @@ type FractionType struct {
 	price Price
 }
 
-func NewFractionTypeFromString(fractionType, city string) (FractionType, error) {
-	fractionPrices, ok := cityFractionPrices[city]
+func NewFractionTypeFromString(fractionType, city, customerType string) (FractionType, error) {
+	cityPrices, ok := fractionPrices[customerType]
+	if !ok {
+		return FractionType{}, ErrUnknownCustomerType
+	}
+	wasteTypePrices, ok := cityPrices[city]
 	if !ok {
 		return FractionType{}, ErrUnknownCity
 	}
-	price, ok := fractionPrices[fractionType]
+	price, ok := wasteTypePrices[fractionType]
 	if !ok {
 		return FractionType{}, ErrUnknownFractionType
 	}

@@ -23,8 +23,8 @@ func TestCalculatePrice_ForABusinessCustomerFromPineville(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "person-1", result.PersonID)
 	assert.Equal(t, "visit-1", result.VisitID)
-	// Green waste: 10 kg * 10 cents = 100 cents; Construction waste: 5 kg * 15 cents = 75 cents; total = 175 cents = 1.75 USD
-	assert.Equal(t, 1.75, result.PriceAmount)
+	// Green waste: 10 kg * 12 cents = 120 cents; Construction waste: 5 kg * 13 cents = 65 cents; total = 185 cents = 1.85 USD
+	assert.Equal(t, 1.85, result.PriceAmount)
 	assert.Equal(t, "USD", result.PriceCurrency)
 }
 

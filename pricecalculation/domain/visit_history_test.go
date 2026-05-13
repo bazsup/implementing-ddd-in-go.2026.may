@@ -41,7 +41,7 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
 	history := NewVisitHistory("person-1")
 	visit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
 	price := history.CalculatePriceOfVisit(visit, fractions)
@@ -57,7 +57,7 @@ func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
 	history.Add(previousVisit2)
 
 	currentVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
 	price := history.CalculatePriceOfVisit(currentVisit, fractions)
@@ -73,7 +73,7 @@ func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAddition
 	history.Add(visit2)
 
 	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
 	price := history.CalculatePriceOfVisit(thirdVisit, fractions)

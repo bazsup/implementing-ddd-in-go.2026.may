@@ -7,111 +7,63 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCalculatePrice_ForConstructionWasteInPineville(t *testing.T) {
-	// arrange
-	fractionType, _ := domain.NewFractionTypeFromString(domain.ConstructionWaste, "Pineville")
-	weight := domain.NewWeightFromKG(10)
-	droppedFraction := domain.NewDroppedFraction(fractionType, weight)
+func TestCalculatePrice(t *testing.T) {
+	tests := []struct {
+		fractionType   string
+		city           string
+		customerType   string
+		weightKG       uint
+		expectedAmount float64
+	}{
+		{domain.ConstructionWaste, "Pineville", "private", 10, 1.5},
+		{domain.GreenWaste, "Pineville", "private", 10, 1.0},
+		{domain.ConstructionWaste, "Oak City", "private", 10, 1.9},
+		{domain.GreenWaste, "Oak City", "private", 10, 0.8},
+		{domain.ConstructionWaste, "Pineville", "business", 10, 1.3},
+		{domain.GreenWaste, "Pineville", "business", 10, 1.2},
+		{domain.ConstructionWaste, "Oak City", "business", 10, 2.1},
+		{domain.GreenWaste, "Oak City", "business", 10, 0.8},
+	}
 
-	// act
-	price := droppedFraction.CalculatePrice()
+	for _, tt := range tests {
+		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
+			fractionType, _ := domain.NewFractionTypeFromString(tt.fractionType, tt.city, tt.customerType)
+			weight := domain.NewWeightFromKG(tt.weightKG)
+			droppedFraction := domain.NewDroppedFraction(fractionType, weight)
 
-	// assert
-	assert.Equal(t, 1.5, price.Amount())
+			price := droppedFraction.CalculatePrice()
+
+			assert.Equal(t, tt.expectedAmount, price.Amount())
+		})
+	}
 }
 
-func TestCalculatePrice_ForGreenWasteInPineville(t *testing.T) {
-	// arrange
-	fractionType, _ := domain.NewFractionTypeFromString(domain.GreenWaste, "Pineville")
-	weight := domain.NewWeightFromKG(10)
-	droppedFraction := domain.NewDroppedFraction(fractionType, weight)
+func TestNewFractionTypeFromString(t *testing.T) {
+	tests := []struct {
+		fractionType string
+		city         string
+		customerType string
+		expectedErr  error
+	}{
+		{domain.ConstructionWaste, "Pineville", "private", nil},
+		{domain.GreenWaste, "Pineville", "private", nil},
+		{domain.ConstructionWaste, "Oak City", "private", nil},
+		{domain.GreenWaste, "Oak City", "private", nil},
+		{domain.ConstructionWaste, "Pineville", "business", nil},
+		{domain.GreenWaste, "Pineville", "business", nil},
+		{domain.ConstructionWaste, "Oak City", "business", nil},
+		{domain.GreenWaste, "Oak City", "business", nil},
+		{"Special waste", "Pineville", "private", domain.ErrUnknownFractionType},
+		{"Special waste", "Oak City", "private", domain.ErrUnknownFractionType},
+		{domain.GreenWaste, "Unknown City", "private", domain.ErrUnknownCity},
+		{domain.GreenWaste, "Pineville", "unknown", domain.ErrUnknownCustomerType},
+	}
 
-	// act
-	price := droppedFraction.CalculatePrice()
+	for _, tt := range tests {
+		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
+			_, err := domain.NewFractionTypeFromString(tt.fractionType, tt.city, tt.customerType)
 
-	// assert
-	assert.Equal(t, 1.0, price.Amount())
+			assert.Equal(t, tt.expectedErr, err)
+		})
+	}
 }
-
-func TestCalculatePrice_ForConstructionWasteInOakCity(t *testing.T) {
-	// arrange
-	fractionType, _ := domain.NewFractionTypeFromString(domain.ConstructionWaste, "Oak City")
-	weight := domain.NewWeightFromKG(10)
-	droppedFraction := domain.NewDroppedFraction(fractionType, weight)
-
-	// act
-	price := droppedFraction.CalculatePrice()
-
-	// assert
-	assert.Equal(t, 1.9, price.Amount())
-}
-
-func TestCalculatePrice_ForGreenWasteInOakCity(t *testing.T) {
-	// arrange
-	fractionType, _ := domain.NewFractionTypeFromString(domain.GreenWaste, "Oak City")
-	weight := domain.NewWeightFromKG(10)
-	droppedFraction := domain.NewDroppedFraction(fractionType, weight)
-
-	// act
-	price := droppedFraction.CalculatePrice()
-
-	// assert
-	assert.Equal(t, 0.8, price.Amount())
-}
-
-func TestNewFractionTypeFromString_ConstructionWasteInPineville(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString(domain.ConstructionWaste, "Pineville")
-
-	// assert
-	assert.NoError(t, err)
-}
-
-func TestNewFractionTypeFromString_GreenWasteInPineville(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString(domain.GreenWaste, "Pineville")
-
-	// assert
-	assert.NoError(t, err)
-}
-
-func TestNewFractionTypeFromString_ConstructionWasteInOakCity(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString(domain.ConstructionWaste, "Oak City")
-
-	// assert
-	assert.NoError(t, err)
-}
-
-func TestNewFractionTypeFromString_GreenWasteInOakCity(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString(domain.GreenWaste, "Oak City")
-
-	// assert
-	assert.NoError(t, err)
-}
-
-func TestNewFractionTypeFromString_UnknownFractionTypeInPineville(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString("Special waste", "Pineville")
-
-	// assert
-	assert.EqualError(t, err, domain.ErrUnknownFractionType.Error())
-}
-
-func TestNewFractionTypeFromString_UnknownFractionTypeInOakCity(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString("Special waste", "Oak City")
-
-	// assert
-	assert.EqualError(t, err, domain.ErrUnknownFractionType.Error())
-}
-
-func TestNewFractionTypeFromString_KnownFractionTypeInUnknownCity(t *testing.T) {
-	// act
-	_, err := domain.NewFractionTypeFromString("Green waste", "Unknown City")
-
-	// assert
-	assert.EqualError(t, err, domain.ErrUnknownCity.Error())
-}
-
