@@ -50,22 +50,14 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		droppedFractions = append(droppedFractions, domain.NewDroppedFraction(ft, domain.NewWeightFromKG(f.AmountKG)))
 	}
 
-	var total domain.Price
-	for _, df := range droppedFractions {
-		total = total.Add(df.CalculatePrice())
-	}
-
 	visit, err := domain.NewVisit(personID, date)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
 
 	visitHistory := c.getVisitHistoryByPersonID(personID)
-	visitHistory.Add(visit)
+	total := visitHistory.CalculatePriceOfVisit(visit, droppedFractions)
 	c.saveVisitHistory(visitHistory)
-	if visitHistory.NumberOfVisitsInMonthOfLastVisit() >= 3 {
-		total = total.AddFee(5)
-	}
 
 	return CalculatedPrice{
 		PersonID:      personID,

@@ -38,6 +38,18 @@ func (vh *VisitHistory) lastVisit() Visit {
 	return vh.visits[len(vh.visits)-1]
 }
 
+func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction) Price {
+	vh.Add(visit)
+	var total Price
+	for _, df := range droppedFractions {
+		total = total.Add(df.CalculatePrice())
+	}
+	if vh.NumberOfVisitsInMonthOfLastVisit() >= 3 {
+		total = total.AddFee(5)
+	}
+	return total
+}
+
 func (vh *VisitHistory) Reset() {
 	vh.visits = []Visit{}
 }

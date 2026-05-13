@@ -38,6 +38,49 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 	assert.Equal(t, 2, count)
 }
 
+func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
+	history := NewVisitHistory("person-1")
+	visit, _ := NewVisit("person-1", "2026-05-14")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
+
+	price := history.CalculatePriceOfVisit(visit, fractions)
+
+	assert.Equal(t, NewPriceFromUSDcents(100), price)
+}
+
+func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
+	history := NewVisitHistory("person-1")
+	previousVisit1, _ := NewVisit("person-1", "2026-04-01")
+	previousVisit2, _ := NewVisit("person-1", "2026-04-15")
+	history.Add(previousVisit1)
+	history.Add(previousVisit2)
+
+	currentVisit, _ := NewVisit("person-1", "2026-05-14")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
+
+	price := history.CalculatePriceOfVisit(currentVisit, fractions)
+
+	assert.Equal(t, NewPriceFromUSDcents(100), price)
+}
+
+func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAdditionalFee5Percent(t *testing.T) {
+	history := NewVisitHistory("person-1")
+	visit1, _ := NewVisit("person-1", "2026-05-01")
+	visit2, _ := NewVisit("person-1", "2026-05-07")
+	history.Add(visit1)
+	history.Add(visit2)
+
+	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville")
+	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
+
+	price := history.CalculatePriceOfVisit(thirdVisit, fractions)
+
+	assert.Equal(t, NewPriceFromUSDcents(105), price)
+}
+
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
 	history := NewVisitHistory("test-person")
 
