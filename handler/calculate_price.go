@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"implementing-ddd-in-go/pricecalculation"
-	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
 type calculatePriceRequest struct {
@@ -37,21 +36,18 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var droppedFractions []domain.DroppedFraction
-	for _, fraction := range req.DroppedFractions {
-		fractionType, err := domain.NewFractionTypeFromString(fraction.FractionType)
-		if err != nil {
-			h.logger.Error().Msg(err.Error())
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		weight := domain.NewWeightFromKG(fraction.AmountDropped)
-		droppedFraction := domain.NewDroppedFraction(fractionType, weight)
-		droppedFractions = append(droppedFractions, droppedFraction)
+	var fractions []pricecalculation.FractionInput
+	for _, f := range req.DroppedFractions {
+		fractions = append(fractions, pricecalculation.FractionInput{Type: f.FractionType, AmountKG: f.AmountDropped})
 	}
-	visit := pricecalculation.NewVisit(req.PersonID, req.VisitID, droppedFractions)
-	calculatedPrice := pricecalculation.CalculatePrice(visit)
+
+	priceCalculator := pricecalculation.NewPriceCalculator(h.getVisitorByID)
+	calculatedPrice, err := priceCalculator.CalculatePrice(req.PersonID, req.VisitID, fractions)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("failed to calculate price")
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	resp := calculatePriceResponse{
 		PersonID:      calculatedPrice.PersonID,

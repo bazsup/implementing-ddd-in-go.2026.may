@@ -17,7 +17,7 @@ func TestStartScenarioHandler(t *testing.T) {
 	var reinitCount uint
 	stubReinitContext := func ()  { reinitCount++ }
 
-	h := handler.New(zerolog.Nop(), stubReinitContext)
+	h := handler.NewHandler(zerolog.Nop(), stubReinitContext, dummyGetVisitorByID)
 	h.StartScenario(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)

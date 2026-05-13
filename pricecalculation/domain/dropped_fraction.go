@@ -3,13 +3,20 @@ package domain
 import "errors"
 
 var ErrUnknownFractionType = errors.New("fraction type not known")
+var ErrUnknownCity = errors.New("city not known")
 
 const ConstructionWaste = "Construction waste"
 const GreenWaste = "Green waste"
 
-var allowedFractionTypePrices = map[string]Price{
-	"Green waste":        NewPriceFromUSDcents(10),
-	"Construction waste": NewPriceFromUSDcents(15),
+var cityFractionPrices = map[string]map[string]Price{
+	"Pineville": {
+		GreenWaste:        NewPriceFromUSDcents(10),
+		ConstructionWaste: NewPriceFromUSDcents(15),
+	},
+	"Oak City": {
+		GreenWaste:        NewPriceFromUSDcents(8),
+		ConstructionWaste: NewPriceFromUSDcents(19),
+	},
 }
 
 type FractionType struct {
@@ -17,11 +24,16 @@ type FractionType struct {
 	price Price
 }
 
-func NewFractionTypeFromString(fractionType string) (FractionType, error) {
-	if price, ok := allowedFractionTypePrices[fractionType]; ok {
-		return FractionType{name: fractionType, price: price}, nil
+func NewFractionTypeFromString(fractionType, city string) (FractionType, error) {
+	fractionPrices, ok := cityFractionPrices[city]
+	if !ok {
+		return FractionType{}, ErrUnknownCity
 	}
-	return FractionType{}, ErrUnknownFractionType
+	price, ok := fractionPrices[fractionType]
+	if !ok {
+		return FractionType{}, ErrUnknownFractionType
+	}
+	return FractionType{name: fractionType, price: price}, nil
 }
 
 type DroppedFraction struct {
