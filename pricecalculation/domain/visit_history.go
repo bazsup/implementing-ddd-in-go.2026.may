@@ -25,3 +25,7 @@ func (vh *VisitHistory) NumberOfVisitsInMonthOfLastVisit() int {
 	}
 	return count
 }
+
+func (vh *VisitHistory) Reset() {
+	vh.visits = []Visit{}
+}
