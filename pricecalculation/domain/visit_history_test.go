@@ -2,14 +2,13 @@ package domain_test
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
-	"implementing-ddd-in-go/pricecalculation/domain"
+	. "implementing-ddd-in-go/pricecalculation/domain"
 )
 
 func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
-	history := domain.NewVisitHistory()
+	history := NewVisitHistory()
 
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
@@ -17,44 +16,44 @@ func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
-	history := domain.NewVisitHistory()
+	// arrange
+	history := NewVisitHistory()
+	lastMonth := "2026-04-01"
+	thisMonth := "2026-05-01"
 
-	lastMonth := time.Now().AddDate(0, -1, 0)
-	thisMonth := time.Now()
+	previousVisit, err := NewVisit("person-1", lastMonth)
+	assert.NoError(t, err, "failed to create visit in test setup")
 
-	history.Add(domain.NewVisit("person-1", lastMonth))
-	history.Add(domain.NewVisit("person-1", thisMonth))
-	history.Add(domain.NewVisit("person-1", thisMonth))
+	currentVisit, err := NewVisit("person-1", thisMonth)
+	assert.NoError(t, err, "failed to create visit in test setup")
 
+	history.Add(previousVisit)
+	history.Add(currentVisit)
+	history.Add(currentVisit)
+
+	// act
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
+	// assert
 	assert.Equal(t, 2, count)
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
-	history := domain.NewVisitHistory()
+	history := NewVisitHistory()
 
-	now := time.Now()
+	thisMonth := "2026-05-01"
 
-	history.Add(domain.NewVisit("person-1", now))
-	history.Add(domain.NewVisit("person-1", now))
-	history.Add(domain.NewVisit("person-2", now))
+	visitID1, err := NewVisit("person-1", thisMonth)
+	assert.NoError(t, err, "failed to create visit in test setup")
 
-	count := history.NumberOfVisitsInMonthOfLastVisit("person-1")
+	visitID2, err := NewVisit("person-2", thisMonth)
+	assert.NoError(t, err, "failed to create visit in test setup")
 
-	assert.Equal(t, 2, count)
-}
-
-func TestNumberOfVisitsInMonthOfLastVisit_2VisitsDifferentMonthCountAs1(t *testing.T) {
-	history := domain.NewVisitHistory()
-
-	lastMonth := time.Now().AddDate(0, -1, 0)
-	thisMonth := time.Now()
-
-	history.Add(domain.NewVisit("person-1", lastMonth))
-	history.Add(domain.NewVisit("person-1", thisMonth))
+	history.Add(visitID1)
+	history.Add(visitID2)
+	history.Add(visitID1)
 
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
-	assert.Equal(t, 1, count)
+	assert.Equal(t, 2, count)
 }

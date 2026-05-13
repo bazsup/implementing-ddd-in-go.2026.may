@@ -1,8 +1,6 @@
 package pricecalculation
 
 import (
-	"time"
-
 	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
@@ -35,11 +33,6 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		return CalculatedPrice{}, err
 	}
 
-	parsedDate, err := time.Parse(time.DateOnly, date)
-	if err != nil {
-		return CalculatedPrice{}, err
-	}
-
 	var droppedFractions []domain.DroppedFraction
 	for _, f := range fractions {
 		ft, err := domain.NewFractionTypeFromString(f.Type, visitor.City())
@@ -54,8 +47,13 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		total = total.Add(df.CalculatePrice())
 	}
 
-	c.visitHistory.Add(domain.NewVisit(personID, parsedDate))
-	if c.visitHistory.NumberOfVisitsInMonthOfLastVisit(personID) >= 3 {
+	visit, err := domain.NewVisit(personID, date)
+	if err != nil {
+		return CalculatedPrice{}, err
+	}
+
+	c.visitHistory.Add(visit)
+	if c.visitHistory.NumberOfVisitsInMonthOfLastVisit() >= 3 {
 		total = total.AddFee(5)
 	}
 

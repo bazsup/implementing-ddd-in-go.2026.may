@@ -1,14 +1,23 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
+
+var ErrInvalidDateForVisit = errors.New("invalid date given for Visit")
 
 type Visit struct {
 	personId string
 	date     time.Time
 }
 
-func NewVisit(personId string, date time.Time) Visit {
-	return Visit{personId: personId, date: date}
+func NewVisit(personId string, date string) (Visit, error) {
+	visitDate, dateErr := time.Parse(time.DateOnly, date)
+	if dateErr != nil {
+		return Visit{}, ErrInvalidDateForVisit
+	}
+	return Visit{personId: personId, date: visitDate}, nil
 }
 
 func (v Visit) inSameMonth(other Visit) bool {
