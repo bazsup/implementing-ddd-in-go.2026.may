@@ -16,14 +16,21 @@ func (vh *VisitHistory) NumberOfVisitsInMonthOfLastVisit() int {
 	if len(vh.visits) == 0 {
 		return 0
 	}
-	last := vh.visits[len(vh.visits)-1]
 	count := 0
 	for _, v := range vh.visits {
-		if v.inSameMonth(last) {
+		if v.inSameMonth(vh.lastVisit()) {
 			count++
 		}
 	}
 	return count
+}
+
+func (vh *VisitHistory) lastVisit() Visit {
+	if len(vh.visits) == 0 {
+		return Visit{}
+	}
+
+	return vh.visits[len(vh.visits)-1]
 }
 
 func (vh *VisitHistory) Reset() {
