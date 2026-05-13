@@ -8,6 +8,8 @@ import (
 
 	"implementing-ddd-in-go/cmd/config"
 	"implementing-ddd-in-go/handler"
+	"implementing-ddd-in-go/infrastructure"
+	"implementing-ddd-in-go/pricecalculation"
 )
 
 func main() {
@@ -17,6 +19,9 @@ func main() {
 	}
 
 	logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
+
+	visitors := infrastructure.NewHTTPExternalVisitors(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
+	_ = pricecalculation.Context{GetVisitorByID: visitors.GetVisitorByID}
 
 	h := handler.New(logger)
 

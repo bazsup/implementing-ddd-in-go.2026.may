@@ -3,7 +3,8 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	ServerPort string
+	ServerPort        string
+	WorkshopServerURL string
 }
 
 func LoadConfig() (Config, error) {
@@ -15,6 +16,7 @@ func LoadConfig() (Config, error) {
 	}
 
 	return Config{
-		ServerPort: ":" + viper.GetString("PORT"),
+		ServerPort:        ":" + viper.GetString("PORT"),
+		WorkshopServerURL: viper.GetString("WORKSHOP_SERVER_URL"),
 	}, nil
 }
