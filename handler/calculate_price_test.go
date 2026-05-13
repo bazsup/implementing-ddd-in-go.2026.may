@@ -27,7 +27,7 @@ func TestCalculatePriceHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/calculatePrice", strings.NewReader(body))
 	rec := httptest.NewRecorder()
 
-	h := handler.New(zerolog.Nop())
+	h := handler.New(zerolog.Nop(), dummyReinitContext)
 	h.CalculatePrice(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)

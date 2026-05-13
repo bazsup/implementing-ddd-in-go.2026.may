@@ -14,10 +14,13 @@ import (
 func TestStartScenarioHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/startScenario", nil)
 	rec := httptest.NewRecorder()
+	var reinitCount uint
+	stubReinitContext := func ()  { reinitCount++ }
 
-	h := handler.New(zerolog.Nop())
+	h := handler.New(zerolog.Nop(), stubReinitContext)
 	h.StartScenario(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
 	assert.JSONEq(t, `{}`, rec.Body.String())
+	assert.Equal(t, uint(1), reinitCount)
 }

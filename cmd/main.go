@@ -20,10 +20,14 @@ func main() {
 
 	logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Logger()
 
+	externalVisitors := infrastructure.NewHTTPExternalVisitors(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
+	context := pricecalculation.NewContext(logger)
+	reinitialContext := func () { context.Initialize(externalVisitors.GetVisitorByID) }
+
 	visitors := infrastructure.NewHTTPExternalVisitors(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
 	_ = pricecalculation.Context{GetVisitorByID: visitors.GetVisitorByID}
 
-	h := handler.New(logger)
+	h := handler.New(logger, reinitialContext)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /", h.Status)

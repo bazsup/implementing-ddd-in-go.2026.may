@@ -5,6 +5,8 @@ import "net/http"
 func (h *Handler) StartScenario(w http.ResponseWriter, _ *http.Request) {
 	h.logger.Info().Msg("handling scenario request")
 
+	h.reinitializingContext()
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte("{}")); err != nil {
