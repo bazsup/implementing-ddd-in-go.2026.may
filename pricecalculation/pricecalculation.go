@@ -5,6 +5,9 @@ import (
 )
 
 type ForGettingVisitorByID func(id string) (domain.ExternalVisitor, error)
+type ForSavingVisitHistories func(*domain.VisitHistory)
+type ForGettingVisitHistoriesByPersonID func(string) *domain.VisitHistory
+type ForResettingVisitHistories func()
 
 type RawDroppedFraction struct {
 	Type     string
@@ -19,12 +22,17 @@ type CalculatedPrice struct {
 }
 
 type PriceCalculator struct {
-	getExternalVisitorByID ForGettingVisitorByID
-	visitHistory           *domain.VisitHistory
+	getExternalVisitorByID    ForGettingVisitorByID
+	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID
+	saveVisitHistory          ForSavingVisitHistories
 }
 
-func NewPriceCalculator(getExternalVisitorByID ForGettingVisitorByID, visitHistory *domain.VisitHistory) PriceCalculator {
-	return PriceCalculator{getExternalVisitorByID, visitHistory}
+func NewPriceCalculator(
+	getExternalVisitorByID ForGettingVisitorByID,
+	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID,
+	saveVisitHistory ForSavingVisitHistories,
+) PriceCalculator {
+	return PriceCalculator{getExternalVisitorByID, getVisitHistoryByPersonID, saveVisitHistory}
 }
 
 func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
@@ -52,8 +60,10 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		return CalculatedPrice{}, err
 	}
 
-	c.visitHistory.Add(visit)
-	if c.visitHistory.NumberOfVisitsInMonthOfLastVisit() >= 3 {
+	visitHistory := c.getVisitHistoryByPersonID(personID)
+	visitHistory.Add(visit)
+	c.saveVisitHistory(visitHistory)
+	if visitHistory.NumberOfVisitsInMonthOfLastVisit() >= 3 {
 		total = total.AddFee(5)
 	}
 

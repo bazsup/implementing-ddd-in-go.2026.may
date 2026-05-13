@@ -2,7 +2,6 @@ package handler
 
 import (
 	"implementing-ddd-in-go/pricecalculation"
-	"implementing-ddd-in-go/pricecalculation/domain"
 
 	"github.com/rs/zerolog"
 )
@@ -10,17 +9,25 @@ import (
 type forReinitializingContext func()
 
 type Handler struct {
-	logger                zerolog.Logger
-	reinitializingContext forReinitializingContext
-	getVisitorByID        pricecalculation.ForGettingVisitorByID
-	visitHistory          *domain.VisitHistory
+	logger                    zerolog.Logger
+	reinitializingContext     forReinitializingContext
+	getVisitorByID            pricecalculation.ForGettingVisitorByID
+	getVisitHistoryByPersonID pricecalculation.ForGettingVisitHistoriesByPersonID
+	saveVisitHistory          pricecalculation.ForSavingVisitHistories
 }
 
 func NewHandler(
 	logger zerolog.Logger,
 	reinitializingContext forReinitializingContext,
 	getVisitorByID pricecalculation.ForGettingVisitorByID,
-	visitHistory *domain.VisitHistory,
+	getVisitHistoryByPersonID pricecalculation.ForGettingVisitHistoriesByPersonID,
+	saveVisitHistory pricecalculation.ForSavingVisitHistories,
 ) *Handler {
-	return &Handler{logger: logger, reinitializingContext: reinitializingContext, getVisitorByID: getVisitorByID, visitHistory: visitHistory}
+	return &Handler{
+		logger:                    logger,
+		reinitializingContext:     reinitializingContext,
+		getVisitorByID:            getVisitorByID,
+		getVisitHistoryByPersonID: getVisitHistoryByPersonID,
+		saveVisitHistory:          saveVisitHistory,
+	}
 }

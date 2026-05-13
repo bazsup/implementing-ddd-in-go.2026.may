@@ -1,11 +1,16 @@
 package domain
 
 type VisitHistory struct {
-	visits []Visit
+	personId string
+	visits   []Visit
 }
 
-func NewVisitHistory() *VisitHistory {
-	return &VisitHistory{}
+func NewVisitHistory(personId string) *VisitHistory {
+	return &VisitHistory{personId: personId}
+}
+
+func (vh *VisitHistory) PersonId() string {
+	return vh.personId
 }
 
 func (vh *VisitHistory) Add(visit Visit) {

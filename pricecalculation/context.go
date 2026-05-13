@@ -1,25 +1,19 @@
 package pricecalculation
 
-import (
-	"implementing-ddd-in-go/pricecalculation/domain"
-
-	"github.com/rs/zerolog"
-)
+import "github.com/rs/zerolog"
 
 type Context struct {
-	logger         zerolog.Logger
-	GetVisitorByID ForGettingVisitorByID
-	VisitHistory   *domain.VisitHistory
-	InitCounter    uint
+	logger                    zerolog.Logger
+	resetVisitHistories       ForResettingVisitHistories
+	InitCounter               uint
 }
 
-func NewContext(logger zerolog.Logger) *Context {
-	return &Context{logger: logger, VisitHistory: domain.NewVisitHistory()}
+func NewContext(logger zerolog.Logger, resetVisitHistories ForResettingVisitHistories) *Context {
+	return &Context{logger: logger, resetVisitHistories: resetVisitHistories}
 }
 
-func (context *Context) Initialize(getVisitorByID ForGettingVisitorByID) {
-	context.GetVisitorByID = getVisitorByID
-	context.VisitHistory.Reset()
+func (context *Context) Initialize() {
+	context.resetVisitHistories()
 	context.InitCounter++
 
 	context.logger.Debug().Msgf("context init count: %d", context.InitCounter)

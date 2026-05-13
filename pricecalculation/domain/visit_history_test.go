@@ -8,7 +8,7 @@ import (
 )
 
 func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
-	history := NewVisitHistory()
+	history := NewVisitHistory("test-person")
 
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
@@ -17,7 +17,7 @@ func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
 
 func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 	// arrange
-	history := NewVisitHistory()
+	history := NewVisitHistory("test-person")
 	lastMonth := "2026-04-01"
 	thisMonth := "2026-05-01"
 
@@ -39,7 +39,7 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
-	history := NewVisitHistory()
+	history := NewVisitHistory("test-person")
 
 	thisMonth := "2026-05-01"
 

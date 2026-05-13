@@ -1,6 +1,8 @@
 package handler_test
 
-import "implementing-ddd-in-go/pricecalculation/domain"
+import (
+	"implementing-ddd-in-go/pricecalculation/domain"
+)
 
 var dummyReinitContext = func() {}
 
@@ -9,4 +11,8 @@ var dummyGetVisitorByID = func(id string) (domain.ExternalVisitor, error) {
 	return v, nil
 }
 
-var dummyVisitHistory = domain.NewVisitHistory()
+var dummyGetVisitHistoryByPersonID = func(id string) *domain.VisitHistory {
+	return domain.NewVisitHistory(id)
+}
+
+var dummySaveVisitHistory = func(*domain.VisitHistory) {}
