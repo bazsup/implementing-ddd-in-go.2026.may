@@ -2,9 +2,11 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"implementing-ddd-in-go/pricecalculation"
+	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
 type calculatePriceRequest struct {
@@ -45,7 +47,11 @@ func (h *Handler) CalculatePrice(w http.ResponseWriter, r *http.Request) {
 	calculatedPrice, err := priceCalculator.CalculatePrice(req.PersonID, req.VisitID, req.Date, fractions)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to calculate price")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, domain.ErrConcurrentModification) {
+			http.Error(w, err.Error(), http.StatusConflict)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
 

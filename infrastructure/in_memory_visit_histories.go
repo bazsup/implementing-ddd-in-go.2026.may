@@ -11,16 +11,21 @@ func NewInMemoryVisitHistories() *InMemoryVisitHistories {
 }
 
 func (h *InMemoryVisitHistories) GetByPersonID(personID string) *domain.VisitHistory {
-	if vh, ok := h.histories[personID]; ok {
-		return vh
+	existing, ok := h.histories[personID]
+	if !ok {
+		existing = domain.NewVisitHistory(personID)
+		h.histories[personID] = existing
 	}
-	vh := domain.NewVisitHistory(personID)
-	h.histories[personID] = vh
-	return vh
+	return domain.HydrateVisitHistory(personID, existing.Visits(), existing.Version())
 }
 
-func (h *InMemoryVisitHistories) Save(vh *domain.VisitHistory) {
-	h.histories[vh.PersonId()] = vh
+func (h *InMemoryVisitHistories) Save(vh *domain.VisitHistory) error {
+	existing, ok := h.histories[vh.PersonId()]
+	if ok && existing.Version()+1 != vh.Version() {
+		return domain.ErrConcurrentModification
+	}
+	h.histories[vh.PersonId()] = domain.HydrateVisitHistory(vh.PersonId(), vh.Visits(), vh.Version())
+	return nil
 }
 
 func (h *InMemoryVisitHistories) Reset() {

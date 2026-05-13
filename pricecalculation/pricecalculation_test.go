@@ -95,8 +95,28 @@ func TestCalculatePrice_BusinessCustomerHasNoAdditionalFeeFor3VisitsInOneMonth(t
 	assert.Equal(t, 1.20, result.PriceAmount)
 }
 
+func TestCalculatePrice_ReturnsConcurrentModificationError(t *testing.T) {
+	getVisitor := func(id string) (domain.ExternalVisitor, error) {
+		return domain.NewExternalVisitor("private", id, "Pine Street 1", "Pineville")
+	}
+	// Simulate a stale load: return a history at version 0, but save always rejects it
+	staleHistory := func(id string) *domain.VisitHistory {
+		return domain.NewVisitHistory(id)
+	}
+	saveAlwaysConflicts := func(*domain.VisitHistory) error {
+		return domain.ErrConcurrentModification
+	}
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, staleHistory, saveAlwaysConflicts, domain.DefaultFractionPricingPolicy)
+
+	_, err := calculator.CalculatePrice("person-1", "visit-1", "2026-05-14", []pricecalculation.RawDroppedFraction{
+		{Type: "Green waste", AmountKG: 10},
+	})
+
+	assert.ErrorIs(t, err, domain.ErrConcurrentModification)
+}
+
 var emptyVisitHistory = func(id string) *domain.VisitHistory {
 	return domain.NewVisitHistory(id)
 }
 
-var noopSaveVisitHistory = func(*domain.VisitHistory) {}
+var noopSaveVisitHistory = func(*domain.VisitHistory) error { return nil }

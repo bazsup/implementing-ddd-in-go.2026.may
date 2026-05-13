@@ -1,12 +1,31 @@
 package domain
 
+import "errors"
+
+var ErrConcurrentModification = errors.New("visit history was modified by another request")
+
 type VisitHistory struct {
 	personId string
 	visits   []Visit
+	version  int
 }
 
 func NewVisitHistory(personId string) *VisitHistory {
 	return &VisitHistory{personId: personId}
+}
+
+func HydrateVisitHistory(personId string, visits []Visit, version int) *VisitHistory {
+	visitsCopy := make([]Visit, len(visits))
+	copy(visitsCopy, visits)
+	return &VisitHistory{personId: personId, visits: visitsCopy, version: version}
+}
+
+func (vh *VisitHistory) Version() int {
+	return vh.version
+}
+
+func (vh *VisitHistory) Visits() []Visit {
+	return vh.visits
 }
 
 func (vh *VisitHistory) PersonId() string {
@@ -64,6 +83,7 @@ func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []Dr
 		total = total.Add(calc.CalculatePrice(df))
 	}
 	vh.Add(visit.withDroppedFractions(droppedFractions))
+	vh.version++
 	return feePolicy.AddFee(vh, total), nil
 }
 

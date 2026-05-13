@@ -5,7 +5,7 @@ import (
 )
 
 type ForGettingVisitorByID func(id string) (domain.ExternalVisitor, error)
-type ForSavingVisitHistories func(*domain.VisitHistory)
+type ForSavingVisitHistories func(*domain.VisitHistory) error
 type ForGettingVisitHistoriesByPersonID func(string) *domain.VisitHistory
 type ForResettingVisitHistories func()
 
@@ -62,7 +62,9 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
-	c.saveVisitHistory(visitHistory)
+	if err := c.saveVisitHistory(visitHistory); err != nil {
+		return CalculatedPrice{}, err
+	}
 
 	return CalculatedPrice{
 		PersonID:      personID,
