@@ -19,7 +19,9 @@ func (vh *VisitHistory) NumberOfVisitsInMonthOfLastVisit() int {
 	last := vh.visits[len(vh.visits)-1]
 	count := 0
 	for _, v := range vh.visits {
-		if v.Date().Year() == last.Date().Year() && v.Date().Month() == last.Date().Month() {
+		if v.PersonId() == personId &&
+			v.Date().Year() == last.Date().Year() &&
+			v.Date().Month() == last.Date().Month() {
 			count++
 		}
 	}
