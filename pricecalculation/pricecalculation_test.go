@@ -70,6 +70,29 @@ func TestCalculatePrice_WithAdditionalFeeFor3VisitsInOneMonth(t *testing.T) {
 	assert.Equal(t, 1.05, result.PriceAmount)
 }
 
+func TestCalculatePrice_BusinessCustomerHasNoAdditionalFeeFor3VisitsInOneMonth(t *testing.T) {
+	getVisitor := func(id string) (domain.ExternalVisitor, error) {
+		return domain.NewExternalVisitor("business", id, "Pine Street 1", "Pineville")
+	}
+	getVisitHistory := func(id string) *domain.VisitHistory {
+		history := domain.NewVisitHistory(id)
+		visit1, _ := domain.NewVisit(id, "2026-05-01")
+		visit2, _ := domain.NewVisit(id, "2026-05-07")
+		history.Add(visit1)
+		history.Add(visit2)
+		return history
+	}
+	calculator := pricecalculation.NewPriceCalculator(getVisitor, getVisitHistory, noopSaveVisitHistory)
+
+	result, err := calculator.CalculatePrice("person-1", "visit-3", "2026-05-14", []pricecalculation.RawDroppedFraction{
+		{Type: "Green waste", AmountKG: 10},
+	})
+
+	assert.NoError(t, err)
+	// Green waste: 10 kg * 12 cents = 120 cents; no additional fee for business customers
+	assert.Equal(t, 1.20, result.PriceAmount)
+}
+
 var emptyVisitHistory = func(id string) *domain.VisitHistory {
 	return domain.NewVisitHistory(id)
 }

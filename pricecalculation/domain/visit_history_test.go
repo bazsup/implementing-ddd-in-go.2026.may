@@ -38,13 +38,23 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 	assert.Equal(t, 2, count)
 }
 
+func privateCustomerFeePolicy() FeePolicy {
+	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "test", "addr", "Pineville")
+	return NewFeePolicy(visitor)
+}
+
+func businessCustomerFeePolicy() FeePolicy {
+	visitor, _ := NewExternalVisitor("business", "test", "addr", "Pineville")
+	return NewFeePolicy(visitor)
+}
+
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
 	history := NewVisitHistory("person-1")
 	visit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(visit, fractions)
+	price := history.CalculatePriceOfVisit(visit, fractions, privateCustomerFeePolicy())
 
 	assert.Equal(t, NewPriceFromUSDcents(100), price)
 }
@@ -57,10 +67,10 @@ func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
 	history.Add(previousVisit2)
 
 	currentVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(currentVisit, fractions)
+	price := history.CalculatePriceOfVisit(currentVisit, fractions, privateCustomerFeePolicy())
 
 	assert.Equal(t, NewPriceFromUSDcents(100), price)
 }
@@ -73,12 +83,28 @@ func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAddition
 	history.Add(visit2)
 
 	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
-	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "private")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", ExternalVisitorTypePrivate)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
-	price := history.CalculatePriceOfVisit(thirdVisit, fractions)
+	price := history.CalculatePriceOfVisit(thirdVisit, fractions, privateCustomerFeePolicy())
 
 	assert.Equal(t, NewPriceFromUSDcents(105), price)
+}
+
+func TestCalculatePriceOfVisit_BusinessCustomerHasNoAdditionalFeeOnThirdVisitThisMonth(t *testing.T) {
+	history := NewVisitHistory("person-1")
+	visit1, _ := NewVisit("person-1", "2026-05-01")
+	visit2, _ := NewVisit("person-1", "2026-05-07")
+	history.Add(visit1)
+	history.Add(visit2)
+
+	thirdVisit, _ := NewVisit("person-1", "2026-05-14")
+	ft, _ := NewFractionTypeFromString("Green waste", "Pineville", "business")
+	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
+
+	price := history.CalculatePriceOfVisit(thirdVisit, fractions, businessCustomerFeePolicy())
+
+	assert.Equal(t, NewPriceFromUSDcents(120), price)
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {

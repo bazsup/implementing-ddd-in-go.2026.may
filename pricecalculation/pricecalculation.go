@@ -56,7 +56,7 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 	}
 
 	visitHistory := c.getVisitHistoryByPersonID(personID)
-	total := visitHistory.CalculatePriceOfVisit(visit, droppedFractions)
+	total := visitHistory.CalculatePriceOfVisit(visit, droppedFractions, domain.NewFeePolicy(visitor))
 	c.saveVisitHistory(visitHistory)
 
 	return CalculatedPrice{

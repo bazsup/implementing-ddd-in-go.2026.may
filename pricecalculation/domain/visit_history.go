@@ -1,7 +1,5 @@
 package domain
 
-const additionalFeeOn3rdVisitPerMonthPercentage = uint(5)
-
 type VisitHistory struct {
 	personId string
 	visits   []Visit
@@ -40,16 +38,13 @@ func (vh *VisitHistory) lastVisit() Visit {
 	return vh.visits[len(vh.visits)-1]
 }
 
-func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction) Price {
+func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction, feePolicy FeePolicy) Price {
 	vh.Add(visit)
 	var total Price
 	for _, df := range droppedFractions {
 		total = total.Add(df.CalculatePrice())
 	}
-	if vh.NumberOfVisitsInMonthOfLastVisit() >= 3 {
-		total = total.AddFee(additionalFeeOn3rdVisitPerMonthPercentage)
-	}
-	return total
+	return feePolicy.AddFee(vh, total)
 }
 
 func (vh *VisitHistory) Reset() {

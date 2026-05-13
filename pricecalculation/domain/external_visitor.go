@@ -4,11 +4,11 @@ import "errors"
 
 var ErrExternalVisitorTypeUnknown = errors.New("unknown visitor type")
 
-const externalVisitorTypePrivate = "private"
+const ExternalVisitorTypePrivate = "private"
 const externalVisitorTypeBusiness = "business"
 
 var knownExternalVisitorTypes = map[string]bool{
-	externalVisitorTypePrivate:  true,
+	ExternalVisitorTypePrivate:  true,
 	externalVisitorTypeBusiness: true,
 }
 
