@@ -31,6 +31,20 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 	assert.Equal(t, 2, count)
 }
 
+func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
+	history := domain.NewVisitHistory()
+
+	now := time.Now()
+
+	history.Add(domain.NewVisit("person-1", now))
+	history.Add(domain.NewVisit("person-1", now))
+	history.Add(domain.NewVisit("person-2", now))
+
+	count := history.NumberOfVisitsInMonthOfLastVisit("person-1")
+
+	assert.Equal(t, 2, count)
+}
+
 func TestNumberOfVisitsInMonthOfLastVisit_2VisitsDifferentMonthCountAs1(t *testing.T) {
 	history := domain.NewVisitHistory()
 
