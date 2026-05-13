@@ -28,6 +28,10 @@ func (p Price) Times(factor uint) Price {
 	return Price{p.amountInSmallestUnit * factor}
 }
 
+func (p Price) AddFee(percentage uint) Price {
+	return p.Add(Price{p.amountInSmallestUnit * percentage / 100})
+}
+
 func (p Price) Equals(other Price) bool {
 	return p.amountInSmallestUnit == other.amountInSmallestUnit
 }
