@@ -28,7 +28,7 @@ func TestCalculatePrice(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
 			ft, _ := domain.NewFractionTypeFromString(tt.fractionType)
-			calc, _ := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType)
+			calc, _ := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType, domain.NewWeightFromKG(0))
 			weight := domain.NewWeightFromKG(tt.weightKG)
 			droppedFraction := domain.NewDroppedFraction(ft, weight)
 
@@ -79,7 +79,7 @@ func TestFractionPricingPolicy_CalculatorFor(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.fractionType+"_"+tt.city+"_"+tt.customerType, func(t *testing.T) {
-			_, err := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType)
+			_, err := domain.DefaultFractionPricingPolicy.CalculatorFor(tt.fractionType, tt.city, tt.customerType, domain.NewWeightFromKG(0))
 
 			assert.Equal(t, tt.expectedErr, err)
 		})

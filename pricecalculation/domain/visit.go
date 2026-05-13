@@ -8,8 +8,9 @@ import (
 var ErrInvalidDateForVisit = errors.New("invalid date given for Visit")
 
 type Visit struct {
-	date    time.Time
-	visitor ExternalVisitor
+	date      time.Time
+	visitor   ExternalVisitor
+	fractions []DroppedFraction
 }
 
 func NewVisit(date string, visitor ExternalVisitor) (Visit, error) {
@@ -36,4 +37,8 @@ func (v Visit) Date() time.Time {
 
 func (v Visit) Visitor() ExternalVisitor {
 	return v.visitor
+}
+
+func (v Visit) withDroppedFractions(fractions []DroppedFraction) Visit {
+	return Visit{date: v.date, visitor: v.visitor, fractions: fractions}
 }

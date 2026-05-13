@@ -38,16 +38,32 @@ func (vh *VisitHistory) lastVisit() Visit {
 	return vh.visits[len(vh.visits)-1]
 }
 
+func (vh *VisitHistory) AccumulatedWeightForFractionTypeInYear(fractionTypeName string, year int) Weight {
+	var total uint
+	for _, v := range vh.visits {
+		if v.date.Year() != year {
+			continue
+		}
+		for _, f := range v.fractions {
+			if f.fractionType.name == fractionTypeName {
+				total += f.weight.Amount()
+			}
+		}
+	}
+	return NewWeightFromKG(total)
+}
+
 func (vh *VisitHistory) CalculatePriceOfVisit(visit Visit, droppedFractions []DroppedFraction, feePolicy FeePolicy, fractionPricingPolicy FractionPricingPolicy) (Price, error) {
-	vh.Add(visit)
 	var total Price
 	for _, df := range droppedFractions {
-		calc, err := fractionPricingPolicy.CalculatorFor(df.fractionType.name, visit.visitor.City(), visit.visitor.Type())
+		alreadyDropped := vh.AccumulatedWeightForFractionTypeInYear(df.fractionType.name, visit.date.Year())
+		calc, err := fractionPricingPolicy.CalculatorFor(df.fractionType.name, visit.visitor.City(), visit.visitor.Type(), alreadyDropped)
 		if err != nil {
 			return Price{}, err
 		}
 		total = total.Add(calc.CalculatePrice(df))
 	}
+	vh.Add(visit.withDroppedFractions(droppedFractions))
 	return feePolicy.AddFee(vh, total), nil
 }
 

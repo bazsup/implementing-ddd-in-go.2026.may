@@ -111,6 +111,56 @@ func TestCalculatePriceOfVisit_BusinessCustomerHasNoAdditionalFeeOnThirdVisitThi
 	assert.Equal(t, NewPriceFromUSDcents(120), price)
 }
 
+func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_FirstVisit(t *testing.T) {
+	history := NewVisitHistory("business-1")
+	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
+	visit, _ := NewVisit("2026-05-01", visitor)
+	ft, _ := NewFractionTypeFromString(ConstructionWaste)
+	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}
+
+	price, err := history.CalculatePriceOfVisit(visit, fractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	assert.NoError(t, err)
+	// 600 * 21 = 12600 cents = $126.00
+	assert.Equal(t, NewPriceFromUSDcents(12600), price)
+}
+
+func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_SecondVisitCrossesThreshold(t *testing.T) {
+	history := NewVisitHistory("business-1")
+	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
+	firstVisit, _ := NewVisit("2026-05-01", visitor)
+	ft, _ := NewFractionTypeFromString(ConstructionWaste)
+	firstFractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}
+	_, _ = history.CalculatePriceOfVisit(firstVisit, firstFractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	secondVisit, _ := NewVisit("2026-06-01", visitor)
+	secondFractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(900))}
+
+	price, err := history.CalculatePriceOfVisit(secondVisit, secondFractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	assert.NoError(t, err)
+	// 400 kg remaining in tier 1: 400 * 21 = 8400; 500 kg in tier 2: 500 * 29 = 14500; total = 22900 cents = $229.00
+	assert.Equal(t, NewPriceFromUSDcents(22900), price)
+}
+
+func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_ExemptionResetsNextYear(t *testing.T) {
+	history := NewVisitHistory("business-1")
+	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
+	ft, _ := NewFractionTypeFromString(ConstructionWaste)
+
+	// Drop 1100 kg in 2026 (100 kg in tier 2)
+	firstVisit, _ := NewVisit("2026-05-01", visitor)
+	_, _ = history.CalculatePriceOfVisit(firstVisit, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(1100))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	// Drop 100 kg in 2027 — exemption resets, all in tier 1
+	newYearVisit, _ := NewVisit("2027-01-01", visitor)
+	price, err := history.CalculatePriceOfVisit(newYearVisit, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(100))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	assert.NoError(t, err)
+	// 100 * 21 = 2100 cents = $21.00
+	assert.Equal(t, NewPriceFromUSDcents(2100), price)
+}
+
 func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
 	history := NewVisitHistory("test-person")
 	visitor1, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "addr", "Pineville")
