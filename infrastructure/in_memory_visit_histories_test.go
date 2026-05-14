@@ -11,7 +11,7 @@ import (
 
 func mustBusinessCustomerInfra(id, street, city string) domain.Customer {
 	addr, _ := domain.NewAddress(street, city)
-	c, _ := domain.NewCustomer("business", id, addr)
+	c, _ := domain.NewCustomer("business", id, addr, "")
 	return c
 }
 

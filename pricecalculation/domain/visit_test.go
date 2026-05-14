@@ -9,7 +9,7 @@ import (
 
 func TestNewVisit_WithInvalidDate(t *testing.T) {
 	addr, _ := NewAddress("Pine Street 1", "Pineville")
-	customer, _ := NewCustomer("private", "person-1", addr)
+	customer, _ := NewCustomer("private", "person-1", addr, "")
 
 	_, err := NewVisit("2025-12-32", customer)
 

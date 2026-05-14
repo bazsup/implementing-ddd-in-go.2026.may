@@ -69,7 +69,7 @@ func (h httpExternalVisitors) GetCustomerByPersonID(personID string) (domain.Cus
 				h.logger.Error().Err(err).Msg("invalid address from external visitors service")
 				return nil, ErrFailedToGetVisitors
 			}
-			return domain.NewCustomer(v.Type, v.ID, address)
+			return domain.NewCustomer(v.Type, v.ID, address, v.Email)
 		}
 	}
 

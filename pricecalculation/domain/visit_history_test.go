@@ -9,13 +9,13 @@ import (
 
 func mustPrivateCustomer(id, street, city string) Customer {
 	addr, _ := NewAddress(street, city)
-	c, _ := NewCustomer("private", id, addr)
+	c, _ := NewCustomer("private", id, addr, "")
 	return c
 }
 
 func mustBusinessCustomer(id, street, city string) Customer {
 	addr, _ := NewAddress(street, city)
-	c, _ := NewCustomer("business", id, addr)
+	c, _ := NewCustomer("business", id, addr, "")
 	return c
 }
 
@@ -197,8 +197,8 @@ func TestNumberOfVisitsInMonthOfLastVisit_DifferentPrivateCustomerNotCount(t *te
 
 func TestCalculatePriceOfVisit_OakCityBusiness_TwoEmployeesShareThreshold(t *testing.T) {
 	addr, _ := NewAddress("Oak Avenue 1", "Oak City")
-	employeeA, _ := NewCustomer("business", "employee-a", addr)
-	employeeB, _ := NewCustomer("business", "employee-b", addr)
+	employeeA, _ := NewCustomer("business", "employee-a", addr, "")
+	employeeB, _ := NewCustomer("business", "employee-b", addr, "")
 
 	// Both employees share the same history (same business ID)
 	history := NewVisitHistory(employeeA.ID())

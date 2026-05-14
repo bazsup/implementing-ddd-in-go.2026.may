@@ -37,10 +37,15 @@ func (c PrivateCustomer) City() string {
 type BusinessCustomer struct {
 	id      string
 	address Address
+	email   string
 }
 
-func NewBusinessCustomer(id string, address Address) BusinessCustomer {
-	return BusinessCustomer{id: id, address: address}
+func NewBusinessCustomer(id string, address Address, email string) BusinessCustomer {
+	return BusinessCustomer{id: id, address: address, email: email}
+}
+
+func (c BusinessCustomer) Email() string {
+	return c.email
 }
 
 func (c BusinessCustomer) ID() string {
@@ -55,10 +60,10 @@ func (c BusinessCustomer) City() string {
 	return c.address.City()
 }
 
-func NewCustomer(visitorType, id string, address Address) (Customer, error) {
+func NewCustomer(visitorType, id string, address Address, email string) (Customer, error) {
 	switch visitorType {
 	case customerTypeBusiness:
-		return NewBusinessCustomer(id, address), nil
+		return NewBusinessCustomer(id, address, email), nil
 	case customerTypePrivate:
 		return NewPrivateCustomer(id, address), nil
 	default:
