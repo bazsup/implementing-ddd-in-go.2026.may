@@ -8,9 +8,10 @@ import (
 )
 
 func TestNewVisit_WithInvalidDate(t *testing.T) {
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
+	addr, _ := NewAddress("Pine Street 1", "Pineville")
+	customer, _ := NewCustomer("private", "person-1", addr)
 
-	_, err := NewVisit("2025-12-32", visitor)
+	_, err := NewVisit("2025-12-32", customer)
 
 	assert.EqualError(t, err, ErrInvalidDateForVisit.Error())
 }

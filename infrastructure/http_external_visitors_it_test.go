@@ -24,7 +24,7 @@ func TestGetVisitorByID_Live(t *testing.T) {
 	sut := NewHTTPExternalVisitors(url, http.DefaultClient.Do, zerolog.Nop())
 
 	// act
-	visitor, err := sut.GetVisitorByID("Squirrel Gus")
+	visitor, err := sut.GetCustomerByPersonID("Squirrel Gus")
 
 	// assert
 	assert.NoError(t, err)

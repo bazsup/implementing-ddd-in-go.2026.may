@@ -6,9 +6,9 @@ import (
 
 var dummyReinitContext = func() {}
 
-var dummyGetVisitorByID = func(id string) (domain.ExternalVisitor, error) {
-	v, _ := domain.NewExternalVisitor("private", id, "Pine Street 1", "Pineville")
-	return v, nil
+var dummyGetVisitorByID = func(id string) (domain.Customer, error) {
+	addr, _ := domain.NewAddress("Pine Street 1", "Pineville")
+	return domain.NewPrivateCustomer(id, addr), nil
 }
 
 var dummyGetVisitHistoryByPersonID = func(id string) *domain.VisitHistory {

@@ -9,11 +9,11 @@ var ErrInvalidDateForVisit = errors.New("invalid date given for Visit")
 
 type Visit struct {
 	date      time.Time
-	visitor   ExternalVisitor
+	visitor   Customer
 	fractions []DroppedFraction
 }
 
-func NewVisit(date string, visitor ExternalVisitor) (Visit, error) {
+func NewVisit(date string, visitor Customer) (Visit, error) {
 	visitDate, err := time.Parse(time.DateOnly, date)
 	if err != nil {
 		return Visit{}, ErrInvalidDateForVisit
@@ -22,20 +22,16 @@ func NewVisit(date string, visitor ExternalVisitor) (Visit, error) {
 }
 
 func (v Visit) inSameMonth(other Visit) bool {
-	return v.PersonId() == other.PersonId() &&
+	return v.visitor.ID() == other.visitor.ID() &&
 		v.Date().Year() == other.Date().Year() &&
 		v.Date().Month() == other.Date().Month()
-}
-
-func (v Visit) PersonId() string {
-	return v.visitor.ID()
 }
 
 func (v Visit) Date() time.Time {
 	return v.date
 }
 
-func (v Visit) Visitor() ExternalVisitor {
+func (v Visit) Visitor() Customer {
 	return v.visitor
 }
 

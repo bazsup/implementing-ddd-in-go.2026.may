@@ -15,8 +15,7 @@ import (
 	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
-func TestGetVisitorByID_ReturnsVisitor(t *testing.T) {
-	// arrange
+func TestGetCustomerByPersonID_ReturnsPrivateCustomer(t *testing.T) {
 	body, _ := json.Marshal([]ExternalVisitorResponse{
 		{ID: "Squirrel Gus", Type: "private", Address: "Lowest Branch 19", City: "Oak City"},
 	})
@@ -24,50 +23,74 @@ func TestGetVisitorByID_ReturnsVisitor(t *testing.T) {
 		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(body))}, nil
 	}, zerolog.Nop())
 
-	// act
-	visitor, err := sut.GetVisitorByID("Squirrel Gus")
+	customer, err := sut.GetCustomerByPersonID("Squirrel Gus")
 
-	// assert
-	expected, _ := domain.NewExternalVisitor("private", "Squirrel Gus", "Lowest Branch 19", "Oak City")
 	assert.NoError(t, err)
-	assert.True(t, visitor.Equals(expected))
+	assert.Equal(t, "Squirrel Gus", customer.ID())
+	assert.Equal(t, "private", customer.Type())
+	assert.Equal(t, "Oak City", customer.City())
 }
 
-func TestGetVisitorByID_VisitorNotFound(t *testing.T) {
-	// arrange
+func TestGetCustomerByPersonID_ReturnsBusinessCustomerWithAddressDerivedID(t *testing.T) {
+	body, _ := json.Marshal([]ExternalVisitorResponse{
+		{ID: "Bear Billy", Type: "business", Address: "Trunk 35", City: "Pineville"},
+	})
+	sut := NewHTTPExternalVisitors("http://stub", func(req *http.Request) (*http.Response, error) {
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(body))}, nil
+	}, zerolog.Nop())
+
+	customer, err := sut.GetCustomerByPersonID("Bear Billy")
+
+	addr, _ := domain.NewAddress("Trunk 35", "Pineville")
+	expected := domain.NewBusinessCustomer("Bear Billy", addr)
+	assert.NoError(t, err)
+	assert.Equal(t, expected.ID(), customer.ID())
+	assert.Equal(t, "business", customer.Type())
+}
+
+func TestGetCustomerByPersonID_TwoEmployeesAtSameAddressHaveSameID(t *testing.T) {
+	body, _ := json.Marshal([]ExternalVisitorResponse{
+		{ID: "employee-a", Type: "business", Address: "Oak Avenue 1", City: "Oak City"},
+		{ID: "employee-b", Type: "business", Address: "Oak Avenue 1", City: "Oak City"},
+	})
+	sut := NewHTTPExternalVisitors("http://stub", func(req *http.Request) (*http.Response, error) {
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(bytes.NewReader(body))}, nil
+	}, zerolog.Nop())
+
+	customerA, errA := sut.GetCustomerByPersonID("employee-a")
+	customerB, errB := sut.GetCustomerByPersonID("employee-b")
+
+	assert.NoError(t, errA)
+	assert.NoError(t, errB)
+	assert.Equal(t, customerA.ID(), customerB.ID())
+}
+
+func TestGetCustomerByPersonID_VisitorNotFound(t *testing.T) {
 	sut := NewHTTPExternalVisitors("http://stub", func(req *http.Request) (*http.Response, error) {
 		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(`[]`))}, nil
 	}, zerolog.Nop())
 
-	// act
-	_, err := sut.GetVisitorByID("Squirrel Gus")
+	_, err := sut.GetCustomerByPersonID("Squirrel Gus")
 
-	// assert
 	assert.EqualError(t, err, ErrExternalVisitorNotFound.Error())
 }
 
-func TestGetVisitorByID_NonOKStatus(t *testing.T) {
-	// arrange
+func TestGetCustomerByPersonID_NonOKStatus(t *testing.T) {
 	sut := NewHTTPExternalVisitors("http://stub", func(req *http.Request) (*http.Response, error) {
 		return &http.Response{StatusCode: http.StatusInternalServerError, Body: io.NopCloser(strings.NewReader(""))}, nil
 	}, zerolog.Nop())
 
-	// act
-	_, err := sut.GetVisitorByID("Squirrel Gus")
+	_, err := sut.GetCustomerByPersonID("Squirrel Gus")
 
-	// assert
 	assert.EqualError(t, err, ErrFailedToGetVisitors.Error())
 }
 
-func TestGetVisitorByID_InvalidJSON(t *testing.T) {
-	// arrange
+func TestGetCustomerByPersonID_InvalidJSON(t *testing.T) {
 	sut := NewHTTPExternalVisitors("http://stub", func(req *http.Request) (*http.Response, error) {
 		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader(`not json`))}, nil
 	}, zerolog.Nop())
 
-	// act
-	_, err := sut.GetVisitorByID("Squirrel Gus")
+	_, err := sut.GetCustomerByPersonID("Squirrel Gus")
 
-	// assert
 	assert.EqualError(t, err, ErrFailedToGetVisitors.Error())
 }

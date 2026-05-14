@@ -5,19 +5,19 @@ import "errors"
 var ErrConcurrentModification = errors.New("visit history was modified by another request")
 
 type VisitHistory struct {
-	personId string
-	visits   []Visit
-	version  int
+	customerID string
+	visits     []Visit
+	version    int
 }
 
-func NewVisitHistory(personId string) *VisitHistory {
-	return &VisitHistory{personId: personId}
+func NewVisitHistory(customerID string) *VisitHistory {
+	return &VisitHistory{customerID: customerID}
 }
 
-func HydrateVisitHistory(personId string, visits []Visit, version int) *VisitHistory {
+func HydrateVisitHistory(customerID string, visits []Visit, version int) *VisitHistory {
 	visitsCopy := make([]Visit, len(visits))
 	copy(visitsCopy, visits)
-	return &VisitHistory{personId: personId, visits: visitsCopy, version: version}
+	return &VisitHistory{customerID: customerID, visits: visitsCopy, version: version}
 }
 
 func (vh *VisitHistory) Version() int {
@@ -28,8 +28,8 @@ func (vh *VisitHistory) Visits() []Visit {
 	return vh.visits
 }
 
-func (vh *VisitHistory) PersonId() string {
-	return vh.personId
+func (vh *VisitHistory) CustomerID() string {
+	return vh.customerID
 }
 
 func (vh *VisitHistory) Add(visit Visit) {

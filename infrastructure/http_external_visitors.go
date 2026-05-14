@@ -33,17 +33,17 @@ type ExternalVisitorResponse struct {
 	Email   string `json:"email"`
 }
 
-func (h httpExternalVisitors) GetVisitorByID(personID string) (domain.ExternalVisitor, error) {
+func (h httpExternalVisitors) GetCustomerByPersonID(personID string) (domain.Customer, error) {
 	req, err := http.NewRequest(http.MethodGet, h.baseURL+"/api/users", nil)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("creating request")
-		return domain.ExternalVisitor{}, ErrFailedToGetVisitors
+		return nil, ErrFailedToGetVisitors
 	}
 
 	resp, err := h.doRequest(req)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("executing request")
-		return domain.ExternalVisitor{}, ErrFailedToGetVisitors
+		return nil, ErrFailedToGetVisitors
 	}
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
@@ -53,20 +53,25 @@ func (h httpExternalVisitors) GetVisitorByID(personID string) (domain.ExternalVi
 
 	if resp.StatusCode != http.StatusOK {
 		h.logger.Error().Int("status", resp.StatusCode).Msg("unexpected status")
-		return domain.ExternalVisitor{}, ErrFailedToGetVisitors
+		return nil, ErrFailedToGetVisitors
 	}
 
 	var visitors []ExternalVisitorResponse
 	if err := json.NewDecoder(resp.Body).Decode(&visitors); err != nil {
 		h.logger.Error().Err(err).Msg("decoding response")
-		return domain.ExternalVisitor{}, ErrFailedToGetVisitors
+		return nil, ErrFailedToGetVisitors
 	}
 
 	for _, v := range visitors {
 		if v.ID == personID {
-			return domain.NewExternalVisitor(v.Type, v.ID, v.Address, v.City)
+			address, err := domain.NewAddress(v.Address, v.City)
+			if err != nil {
+				h.logger.Error().Err(err).Msg("invalid address from external visitors service")
+				return nil, ErrFailedToGetVisitors
+			}
+			return domain.NewCustomer(v.Type, v.ID, address)
 		}
 	}
 
-	return domain.ExternalVisitor{}, ErrExternalVisitorNotFound
+	return nil, ErrExternalVisitorNotFound
 }

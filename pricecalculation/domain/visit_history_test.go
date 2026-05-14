@@ -7,6 +7,18 @@ import (
 	. "implementing-ddd-in-go/pricecalculation/domain"
 )
 
+func mustPrivateCustomer(id, street, city string) Customer {
+	addr, _ := NewAddress(street, city)
+	c, _ := NewCustomer("private", id, addr)
+	return c
+}
+
+func mustBusinessCustomer(id, street, city string) Customer {
+	addr, _ := NewAddress(street, city)
+	c, _ := NewCustomer("business", id, addr)
+	return c
+}
+
 func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
 	history := NewVisitHistory("test-person")
 
@@ -16,13 +28,13 @@ func TestNumberOfVisitsInMonthOfLastVisit_NoVisits(t *testing.T) {
 }
 
 func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
-	history := NewVisitHistory("test-person")
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "test-person", "addr", "Pineville")
+	customer := mustPrivateCustomer("test-person", "addr", "Pineville")
+	history := NewVisitHistory(customer.ID())
 
-	previousVisit, err := NewVisit("2026-04-01", visitor)
+	previousVisit, err := NewVisit("2026-04-01", customer)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
-	currentVisit, err := NewVisit("2026-05-01", visitor)
+	currentVisit, err := NewVisit("2026-05-01", customer)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
 	history.Add(previousVisit)
@@ -35,19 +47,19 @@ func TestNumberOfVisitsInMonthOfLastVisit_2VisitsInTheSameMonth(t *testing.T) {
 }
 
 func privateCustomerFeePolicy() FeePolicy {
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "test", "addr", "Pineville")
-	return NewFeePolicy(visitor)
+	customer := mustPrivateCustomer("test", "addr", "Pineville")
+	return NewFeePolicy(customer)
 }
 
 func businessCustomerFeePolicy() FeePolicy {
-	visitor, _ := NewExternalVisitor("business", "test", "addr", "Pineville")
-	return NewFeePolicy(visitor)
+	customer := mustBusinessCustomer("test", "addr", "Pineville")
+	return NewFeePolicy(customer)
 }
 
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
-	history := NewVisitHistory("person-1")
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
-	visit, _ := NewVisit("2026-05-14", visitor)
+	customer := mustPrivateCustomer("person-1", "Pine Street 1", "Pineville")
+	history := NewVisitHistory(customer.ID())
+	visit, _ := NewVisit("2026-05-14", customer)
 	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
@@ -58,14 +70,14 @@ func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitEver(t *testing.T) {
 }
 
 func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
-	history := NewVisitHistory("person-1")
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
-	previousVisit1, _ := NewVisit("2026-04-01", visitor)
-	previousVisit2, _ := NewVisit("2026-04-15", visitor)
+	customer := mustPrivateCustomer("person-1", "Pine Street 1", "Pineville")
+	history := NewVisitHistory(customer.ID())
+	previousVisit1, _ := NewVisit("2026-04-01", customer)
+	previousVisit2, _ := NewVisit("2026-04-15", customer)
 	history.Add(previousVisit1)
 	history.Add(previousVisit2)
 
-	currentVisit, _ := NewVisit("2026-05-14", visitor)
+	currentVisit, _ := NewVisit("2026-05-14", customer)
 	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
@@ -76,14 +88,14 @@ func TestCalculatePriceOfVisit_WhenItIsTheFirstVisitThisMonth(t *testing.T) {
 }
 
 func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAdditionalFee5Percent(t *testing.T) {
-	history := NewVisitHistory("person-1")
-	visitor, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "Pine Street 1", "Pineville")
-	visit1, _ := NewVisit("2026-05-01", visitor)
-	visit2, _ := NewVisit("2026-05-07", visitor)
+	customer := mustPrivateCustomer("person-1", "Pine Street 1", "Pineville")
+	history := NewVisitHistory(customer.ID())
+	visit1, _ := NewVisit("2026-05-01", customer)
+	visit2, _ := NewVisit("2026-05-07", customer)
 	history.Add(visit1)
 	history.Add(visit2)
 
-	thirdVisit, _ := NewVisit("2026-05-14", visitor)
+	thirdVisit, _ := NewVisit("2026-05-14", customer)
 	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
@@ -94,14 +106,14 @@ func TestCalculatePriceOfVisit_WhenItIsTheThirdVisitThisMonth_ShouldHaveAddition
 }
 
 func TestCalculatePriceOfVisit_BusinessCustomerHasNoAdditionalFeeOnThirdVisitThisMonth(t *testing.T) {
-	history := NewVisitHistory("person-1")
-	visitor, _ := NewExternalVisitor("business", "person-1", "Pine Street 1", "Pineville")
-	visit1, _ := NewVisit("2026-05-01", visitor)
-	visit2, _ := NewVisit("2026-05-07", visitor)
+	customer := mustBusinessCustomer("person-1", "Pine Street 1", "Pineville")
+	history := NewVisitHistory(customer.ID())
+	visit1, _ := NewVisit("2026-05-01", customer)
+	visit2, _ := NewVisit("2026-05-07", customer)
 	history.Add(visit1)
 	history.Add(visit2)
 
-	thirdVisit, _ := NewVisit("2026-05-14", visitor)
+	thirdVisit, _ := NewVisit("2026-05-14", customer)
 	ft, _ := NewFractionTypeFromString(GreenWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(10))}
 
@@ -112,9 +124,9 @@ func TestCalculatePriceOfVisit_BusinessCustomerHasNoAdditionalFeeOnThirdVisitThi
 }
 
 func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_FirstVisit(t *testing.T) {
-	history := NewVisitHistory("business-1")
-	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
-	visit, _ := NewVisit("2026-05-01", visitor)
+	customer := mustBusinessCustomer("business-1", "Oak Avenue 1", "Oak City")
+	history := NewVisitHistory(customer.ID())
+	visit, _ := NewVisit("2026-05-01", customer)
 	ft, _ := NewFractionTypeFromString(ConstructionWaste)
 	fractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}
 
@@ -126,14 +138,14 @@ func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_FirstVisit(t *te
 }
 
 func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_SecondVisitCrossesThreshold(t *testing.T) {
-	history := NewVisitHistory("business-1")
-	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
-	firstVisit, _ := NewVisit("2026-05-01", visitor)
+	customer := mustBusinessCustomer("business-1", "Oak Avenue 1", "Oak City")
+	history := NewVisitHistory(customer.ID())
+	firstVisit, _ := NewVisit("2026-05-01", customer)
 	ft, _ := NewFractionTypeFromString(ConstructionWaste)
 	firstFractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}
 	_, _ = history.CalculatePriceOfVisit(firstVisit, firstFractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
-	secondVisit, _ := NewVisit("2026-06-01", visitor)
+	secondVisit, _ := NewVisit("2026-06-01", customer)
 	secondFractions := []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(900))}
 
 	price, err := history.CalculatePriceOfVisit(secondVisit, secondFractions, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
@@ -144,16 +156,16 @@ func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_SecondVisitCross
 }
 
 func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_ExemptionResetsNextYear(t *testing.T) {
-	history := NewVisitHistory("business-1")
-	visitor, _ := NewExternalVisitor("business", "business-1", "Oak Avenue 1", "Oak City")
+	customer := mustBusinessCustomer("business-1", "Oak Avenue 1", "Oak City")
+	history := NewVisitHistory(customer.ID())
 	ft, _ := NewFractionTypeFromString(ConstructionWaste)
 
 	// Drop 1100 kg in 2026 (100 kg in tier 2)
-	firstVisit, _ := NewVisit("2026-05-01", visitor)
+	firstVisit, _ := NewVisit("2026-05-01", customer)
 	_, _ = history.CalculatePriceOfVisit(firstVisit, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(1100))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
 	// Drop 100 kg in 2027 — exemption resets, all in tier 1
-	newYearVisit, _ := NewVisit("2027-01-01", visitor)
+	newYearVisit, _ := NewVisit("2027-01-01", customer)
 	price, err := history.CalculatePriceOfVisit(newYearVisit, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(100))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
 
 	assert.NoError(t, err)
@@ -161,22 +173,47 @@ func TestCalculatePriceOfVisit_OakCityBusinessConstructionWaste_ExemptionResetsN
 	assert.Equal(t, NewPriceFromUSDcents(2100), price)
 }
 
-func TestNumberOfVisitsInMonthOfLastVisit_DifferentPersonNotCount(t *testing.T) {
-	history := NewVisitHistory("test-person")
-	visitor1, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-1", "addr", "Pineville")
-	visitor2, _ := NewExternalVisitor(ExternalVisitorTypePrivate, "person-2", "addr", "Pineville")
+func TestNumberOfVisitsInMonthOfLastVisit_DifferentPrivateCustomerNotCount(t *testing.T) {
+	customer1 := mustPrivateCustomer("person-1", "addr", "Pineville")
+	customer2 := mustPrivateCustomer("person-2", "addr", "Pineville")
 
-	visitID1, err := NewVisit("2026-05-01", visitor1)
+	// Two private customers sharing a history (unusual, but tests the ID-based grouping)
+	history := NewVisitHistory(customer1.ID())
+
+	visit1, err := NewVisit("2026-05-01", customer1)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
-	visitID2, err := NewVisit("2026-05-01", visitor2)
+	visit2, err := NewVisit("2026-05-01", customer2)
 	assert.NoError(t, err, "failed to create visit in test setup")
 
-	history.Add(visitID1)
-	history.Add(visitID2)
-	history.Add(visitID1)
+	history.Add(visit1)
+	history.Add(visit2)
+	history.Add(visit1)
 
 	count := history.NumberOfVisitsInMonthOfLastVisit()
 
 	assert.Equal(t, 2, count)
+}
+
+func TestCalculatePriceOfVisit_OakCityBusiness_TwoEmployeesShareThreshold(t *testing.T) {
+	addr, _ := NewAddress("Oak Avenue 1", "Oak City")
+	employeeA, _ := NewCustomer("business", "employee-a", addr)
+	employeeB, _ := NewCustomer("business", "employee-b", addr)
+
+	// Both employees share the same history (same business ID)
+	history := NewVisitHistory(employeeA.ID())
+
+	ft, _ := NewFractionTypeFromString(ConstructionWaste)
+
+	// Employee A drops 600 kg
+	visitA, _ := NewVisit("2026-05-01", employeeA)
+	_, _ = history.CalculatePriceOfVisit(visitA, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	// Employee B drops 600 kg — business has now dropped 1200 kg total, 200 kg should be in tier 2
+	visitB, _ := NewVisit("2026-06-01", employeeB)
+	price, err := history.CalculatePriceOfVisit(visitB, []DroppedFraction{NewDroppedFraction(ft, NewWeightFromKG(600))}, businessCustomerFeePolicy(), DefaultFractionPricingPolicy)
+
+	assert.NoError(t, err)
+	// 400 kg in tier 1: 400 * 21 = 8400; 200 kg in tier 2: 200 * 29 = 5800; total = 14200 cents = $142.00
+	assert.Equal(t, NewPriceFromUSDcents(14200), price)
 }

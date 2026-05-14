@@ -8,16 +8,16 @@ type Visits interface {
 }
 
 type FeePolicy struct {
-	visitor ExternalVisitor
+	customer Customer
 }
 
-func NewFeePolicy(visitor ExternalVisitor) FeePolicy {
-	return FeePolicy{visitor: visitor}
+func NewFeePolicy(customer Customer) FeePolicy {
+	return FeePolicy{customer: customer}
 }
 
 func (p FeePolicy) AddFee(visits Visits, totalPrice Price) Price {
-	switch p.visitor.Type() {
-	case ExternalVisitorTypePrivate:
+	switch p.customer.Type() {
+	case customerTypePrivate:
 		return p.addFeeForPrivateVisitor(visits, totalPrice)
 	default:
 		return totalPrice

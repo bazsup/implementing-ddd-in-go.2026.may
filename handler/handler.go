@@ -10,28 +10,28 @@ import (
 type forReinitializingContext func()
 
 type Handler struct {
-	logger                    zerolog.Logger
-	reinitializingContext     forReinitializingContext
-	getVisitorByID            pricecalculation.ForGettingVisitorByID
-	getVisitHistoryByPersonID pricecalculation.ForGettingVisitHistoriesByPersonID
-	saveVisitHistory          pricecalculation.ForSavingVisitHistories
-	fractionPricingPolicy     domain.FractionPricingPolicy
+	logger                      zerolog.Logger
+	reinitializingContext       forReinitializingContext
+	getCustomerByPersonID       pricecalculation.ForGettingCustomerByPersonID
+	getVisitHistoryByCustomerID pricecalculation.ForGettingVisitHistoriesByCustomerID
+	saveVisitHistory            pricecalculation.ForSavingVisitHistories
+	fractionPricingPolicy       domain.FractionPricingPolicy
 }
 
 func NewHandler(
 	logger zerolog.Logger,
 	reinitializingContext forReinitializingContext,
-	getVisitorByID pricecalculation.ForGettingVisitorByID,
-	getVisitHistoryByPersonID pricecalculation.ForGettingVisitHistoriesByPersonID,
+	getCustomerByPersonID pricecalculation.ForGettingCustomerByPersonID,
+	getVisitHistoryByCustomerID pricecalculation.ForGettingVisitHistoriesByCustomerID,
 	saveVisitHistory pricecalculation.ForSavingVisitHistories,
 	fractionPricingPolicy domain.FractionPricingPolicy,
 ) *Handler {
 	return &Handler{
-		logger:                    logger,
-		reinitializingContext:     reinitializingContext,
-		getVisitorByID:            getVisitorByID,
-		getVisitHistoryByPersonID: getVisitHistoryByPersonID,
-		saveVisitHistory:          saveVisitHistory,
-		fractionPricingPolicy:     fractionPricingPolicy,
+		logger:                      logger,
+		reinitializingContext:       reinitializingContext,
+		getCustomerByPersonID:       getCustomerByPersonID,
+		getVisitHistoryByCustomerID: getVisitHistoryByCustomerID,
+		saveVisitHistory:            saveVisitHistory,
+		fractionPricingPolicy:       fractionPricingPolicy,
 	}
 }

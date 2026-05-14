@@ -4,9 +4,9 @@ import (
 	"implementing-ddd-in-go/pricecalculation/domain"
 )
 
-type ForGettingVisitorByID func(id string) (domain.ExternalVisitor, error)
+type ForGettingCustomerByPersonID func(personID string) (domain.Customer, error)
 type ForSavingVisitHistories func(*domain.VisitHistory) error
-type ForGettingVisitHistoriesByPersonID func(string) *domain.VisitHistory
+type ForGettingVisitHistoriesByCustomerID func(customerID string) *domain.VisitHistory
 type ForResettingVisitHistories func()
 
 type RawDroppedFraction struct {
@@ -22,23 +22,23 @@ type CalculatedPrice struct {
 }
 
 type PriceCalculator struct {
-	getExternalVisitorByID    ForGettingVisitorByID
-	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID
-	saveVisitHistory          ForSavingVisitHistories
-	fractionPricingPolicy     domain.FractionPricingPolicy
+	getCustomerByPersonID    ForGettingCustomerByPersonID
+	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID
+	saveVisitHistory         ForSavingVisitHistories
+	fractionPricingPolicy    domain.FractionPricingPolicy
 }
 
 func NewPriceCalculator(
-	getExternalVisitorByID ForGettingVisitorByID,
-	getVisitHistoryByPersonID ForGettingVisitHistoriesByPersonID,
+	getCustomerByPersonID ForGettingCustomerByPersonID,
+	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID,
 	saveVisitHistory ForSavingVisitHistories,
 	fractionPricingPolicy domain.FractionPricingPolicy,
 ) PriceCalculator {
-	return PriceCalculator{getExternalVisitorByID, getVisitHistoryByPersonID, saveVisitHistory, fractionPricingPolicy}
+	return PriceCalculator{getCustomerByPersonID, getVisitHistoryByCustomerID, saveVisitHistory, fractionPricingPolicy}
 }
 
 func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
-	visitor, err := c.getExternalVisitorByID(personID)
+	customer, err := c.getCustomerByPersonID(personID)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
@@ -52,13 +52,13 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		droppedFractions = append(droppedFractions, domain.NewDroppedFraction(ft, domain.NewWeightFromKG(f.AmountKG)))
 	}
 
-	visit, err := domain.NewVisit(date, visitor)
+	visit, err := domain.NewVisit(date, customer)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}
 
-	visitHistory := c.getVisitHistoryByPersonID(personID)
-	total, err := visitHistory.CalculatePriceOfVisit(visit, droppedFractions, domain.NewFeePolicy(visitor), c.fractionPricingPolicy)
+	visitHistory := c.getVisitHistoryByCustomerID(customer.ID())
+	total, err := visitHistory.CalculatePriceOfVisit(visit, droppedFractions, domain.NewFeePolicy(customer), c.fractionPricingPolicy)
 	if err != nil {
 		return CalculatedPrice{}, err
 	}

@@ -28,8 +28,8 @@ func main() {
 	h := handler.NewHandler(
 		logger,
 		context.Initialize,
-		externalVisitors.GetVisitorByID,
-		visitHistories.GetByPersonID,
+		externalVisitors.GetCustomerByPersonID,
+		visitHistories.GetByCustomerID,
 		visitHistories.Save,
 		domain.DefaultFractionPricingPolicy,
 	)
