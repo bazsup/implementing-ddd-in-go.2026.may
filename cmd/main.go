@@ -32,6 +32,7 @@ func main() {
 		visitHistories.GetByCustomerID,
 		visitHistories.Save,
 		domain.DefaultFractionPricingPolicy,
+		func(domain.PriceCalculated) error { return nil },
 	)
 
 	mux := http.NewServeMux()

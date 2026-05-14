@@ -19,7 +19,7 @@ func TestCalculatePrice_ForABusinessCustomerFromPineville(t *testing.T) {
 	getCustomer := func(id string) (domain.Customer, error) {
 		return mustCustomer("business", id, "Pine Street 1", "Pineville"), nil
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-1", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -38,7 +38,7 @@ func TestCalculatePrice_ForAPrivateCustomerFromOakCity(t *testing.T) {
 	getCustomer := func(id string) (domain.Customer, error) {
 		return mustCustomer("private", id, "Oak Avenue 2", "Oak City"), nil
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, emptyVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	result, err := calculator.CalculatePrice("person-2", "visit-2", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -67,7 +67,7 @@ func TestCalculatePrice_WithAdditionalFeeFor3VisitsInOneMonth(t *testing.T) {
 		history.Add(visit2)
 		return history
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-3", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -93,7 +93,7 @@ func TestCalculatePrice_BusinessCustomerHasNoAdditionalFeeFor3VisitsInOneMonth(t
 		history.Add(visit2)
 		return history
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	result, err := calculator.CalculatePrice("person-1", "visit-3", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -120,7 +120,7 @@ func TestCalculatePrice_BusinessEmployeesShareYearlyWeightThreshold(t *testing.T
 		_, _ = history.CalculatePriceOfVisit(visitA, []domain.DroppedFraction{domain.NewDroppedFraction(ft, domain.NewWeightFromKG(600))}, domain.NewFeePolicy(employeeA), domain.DefaultFractionPricingPolicy)
 		return history
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, getVisitHistory, noopSaveVisitHistory, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	result, err := calculator.CalculatePrice("employee-b", "visit-b", "2026-06-01", []pricecalculation.RawDroppedFraction{
 		{Type: "Construction waste", AmountKG: 600},
@@ -141,7 +141,7 @@ func TestCalculatePrice_ReturnsConcurrentModificationError(t *testing.T) {
 	saveAlwaysConflicts := func(*domain.VisitHistory) error {
 		return domain.ErrConcurrentModification
 	}
-	calculator := pricecalculation.NewPriceCalculator(getCustomer, staleHistory, saveAlwaysConflicts, domain.DefaultFractionPricingPolicy)
+	calculator := pricecalculation.NewPriceCalculator(getCustomer, staleHistory, saveAlwaysConflicts, domain.DefaultFractionPricingPolicy, noopPublishPriceCalculated)
 
 	_, err := calculator.CalculatePrice("person-1", "visit-1", "2026-05-14", []pricecalculation.RawDroppedFraction{
 		{Type: "Green waste", AmountKG: 10},
@@ -155,3 +155,5 @@ var emptyVisitHistory = func(customerID string) *domain.VisitHistory {
 }
 
 var noopSaveVisitHistory = func(*domain.VisitHistory) error { return nil }
+
+var noopPublishPriceCalculated = func(domain.PriceCalculated) error { return nil }

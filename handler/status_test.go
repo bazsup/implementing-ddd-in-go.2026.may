@@ -15,7 +15,7 @@ func TestStatusHandler(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	rec := httptest.NewRecorder()
 
-	h := handler.NewHandler(zerolog.Nop(), dummyReinitContext, dummyGetVisitorByID, dummyGetVisitHistoryByPersonID, dummySaveVisitHistory, dummyFractionPricingPolicy)
+	h := handler.NewHandler(zerolog.Nop(), dummyReinitContext, dummyGetVisitorByID, dummyGetVisitHistoryByPersonID, dummySaveVisitHistory, dummyFractionPricingPolicy, dummyPublishPriceCalculated)
 	h.Status(rec, req)
 
 	assert.Equal(t, http.StatusOK, rec.Code)

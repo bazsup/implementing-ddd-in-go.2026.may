@@ -8,6 +8,7 @@ type ForGettingCustomerByPersonID func(personID string) (domain.Customer, error)
 type ForSavingVisitHistories func(*domain.VisitHistory) error
 type ForGettingVisitHistoriesByCustomerID func(customerID string) *domain.VisitHistory
 type ForResettingVisitHistories func()
+type ForPublishingPriceCalculated func(domain.PriceCalculated) error
 
 type RawDroppedFraction struct {
 	Type     string
@@ -22,10 +23,11 @@ type CalculatedPrice struct {
 }
 
 type PriceCalculator struct {
-	getCustomerByPersonID    ForGettingCustomerByPersonID
+	getCustomerByPersonID       ForGettingCustomerByPersonID
 	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID
-	saveVisitHistory         ForSavingVisitHistories
-	fractionPricingPolicy    domain.FractionPricingPolicy
+	saveVisitHistory            ForSavingVisitHistories
+	fractionPricingPolicy       domain.FractionPricingPolicy
+	publishPriceCalculated      ForPublishingPriceCalculated
 }
 
 func NewPriceCalculator(
@@ -33,8 +35,9 @@ func NewPriceCalculator(
 	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID,
 	saveVisitHistory ForSavingVisitHistories,
 	fractionPricingPolicy domain.FractionPricingPolicy,
+	publishPriceCalculated ForPublishingPriceCalculated,
 ) PriceCalculator {
-	return PriceCalculator{getCustomerByPersonID, getVisitHistoryByCustomerID, saveVisitHistory, fractionPricingPolicy}
+	return PriceCalculator{getCustomerByPersonID, getVisitHistoryByCustomerID, saveVisitHistory, fractionPricingPolicy, publishPriceCalculated}
 }
 
 func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
@@ -63,6 +66,22 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		return CalculatedPrice{}, err
 	}
 	if err := c.saveVisitHistory(visitHistory); err != nil {
+		return CalculatedPrice{}, err
+	}
+
+	var email string
+	if bc, ok := customer.(domain.BusinessCustomer); ok {
+		email = bc.Email()
+	}
+
+	if err := c.publishPriceCalculated(domain.PriceCalculated{
+		PersonID:      personID,
+		VisitID:       visitID,
+		CustomerType:  customer.Type(),
+		PriceAmount:   total.Amount(),
+		PriceCurrency: total.Currency(),
+		Email:         email,
+	}); err != nil {
 		return CalculatedPrice{}, err
 	}
 
