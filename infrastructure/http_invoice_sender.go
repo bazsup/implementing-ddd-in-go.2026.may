@@ -29,26 +29,21 @@ func NewHTTPInvoiceSender(baseURL string, doRequest forDoingHttpRequest, logger 
 	return httpInvoiceSender{baseURL: baseURL, doRequest: doRequest, logger: logger}
 }
 
-func WhenInvoicingPolicy(policy domain.InvoicingPolicy, send func(domain.DomainEvent) error) func(domain.DomainEvent) error {
+func WhenInvoicingPolicy(policy domain.InvoicingPolicy, send func(email string, amount float64, currency string) error) func(domain.DomainEvent) error {
 	return func(event domain.DomainEvent) error {
 		pc, ok := event.(domain.PriceCalculated)
 		if !ok || !policy(pc) {
 			return nil
 		}
-		return send(event)
+		return send(pc.Email, pc.PriceAmount, pc.PriceCurrency)
 	}
 }
 
-func (s httpInvoiceSender) Send(event domain.DomainEvent) error {
-	pc, ok := event.(domain.PriceCalculated)
-	if !ok {
-		return nil
-	}
-
+func (s httpInvoiceSender) Send(email string, amount float64, currency string) error {
 	payload := invoiceRequest{
-		Email:           pc.Email,
-		InvoiceAmount:   pc.PriceAmount,
-		InvoiceCurrency: pc.PriceCurrency,
+		Email:           email,
+		InvoiceAmount:   amount,
+		InvoiceCurrency: currency,
 	}
 
 	body, err := json.Marshal(payload)
