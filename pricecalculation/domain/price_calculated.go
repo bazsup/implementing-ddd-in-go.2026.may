@@ -8,3 +8,5 @@ type PriceCalculated struct {
 	PriceCurrency string
 	Email         string
 }
+
+func (e PriceCalculated) Type() string { return "PriceCalculated" }
