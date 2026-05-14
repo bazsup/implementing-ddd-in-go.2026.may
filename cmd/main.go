@@ -23,6 +23,7 @@ func main() {
 
 	externalVisitors := infrastructure.NewHTTPExternalVisitors(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
 	visitHistories := infrastructure.NewInMemoryVisitHistories()
+	invoiceSender := infrastructure.NewHTTPInvoiceSender(conf.WorkshopServerURL, http.DefaultClient.Do, logger, domain.BusinessCustomersRequireInvoice)
 	context := pricecalculation.NewContext(logger, visitHistories.Reset)
 
 	h := handler.NewHandler(
@@ -32,7 +33,7 @@ func main() {
 		visitHistories.GetByCustomerID,
 		visitHistories.Save,
 		domain.DefaultFractionPricingPolicy,
-		func(domain.PriceCalculated) error { return nil },
+		invoiceSender.SendInvoiceOnPriceCalculated,
 	)
 
 	mux := http.NewServeMux()
