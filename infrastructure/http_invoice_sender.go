@@ -29,6 +29,16 @@ func NewHTTPInvoiceSender(baseURL string, doRequest forDoingHttpRequest, logger 
 	return httpInvoiceSender{baseURL: baseURL, doRequest: doRequest, logger: logger}
 }
 
+func WhenInvoicingPolicy(policy domain.InvoicingPolicy, send func(domain.DomainEvent) error) func(domain.DomainEvent) error {
+	return func(event domain.DomainEvent) error {
+		pc, ok := event.(domain.PriceCalculated)
+		if !ok || !policy(pc) {
+			return nil
+		}
+		return send(event)
+	}
+}
+
 func (s httpInvoiceSender) Send(event domain.DomainEvent) error {
 	pc, ok := event.(domain.PriceCalculated)
 	if !ok {

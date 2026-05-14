@@ -9,6 +9,7 @@ import (
 	"implementing-ddd-in-go/cmd/config"
 	"implementing-ddd-in-go/handler"
 	"implementing-ddd-in-go/infrastructure"
+	"implementing-ddd-in-go/messaging"
 	"implementing-ddd-in-go/pricecalculation"
 	"implementing-ddd-in-go/pricecalculation/domain"
 )
@@ -24,6 +25,8 @@ func main() {
 	externalVisitors := infrastructure.NewHTTPExternalVisitors(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
 	visitHistories := infrastructure.NewInMemoryVisitHistories()
 	invoiceSender := infrastructure.NewHTTPInvoiceSender(conf.WorkshopServerURL, http.DefaultClient.Do, logger)
+	bus := messaging.NewBus()
+	bus.Register("PriceCalculated", infrastructure.WhenInvoicingPolicy(domain.BusinessCustomersRequireInvoice, invoiceSender.Send))
 	context := pricecalculation.NewContext(logger, visitHistories.Reset)
 
 	h := handler.NewHandler(
@@ -33,7 +36,7 @@ func main() {
 		visitHistories.GetByCustomerID,
 		visitHistories.Save,
 		domain.DefaultFractionPricingPolicy,
-		invoiceSender.Send,
+		bus.Send,
 	)
 
 	mux := http.NewServeMux()
