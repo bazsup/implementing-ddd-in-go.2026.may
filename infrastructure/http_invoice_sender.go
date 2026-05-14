@@ -20,25 +20,25 @@ type invoiceRequest struct {
 }
 
 type httpInvoiceSender struct {
-	baseURL         string
-	doRequest       forDoingHttpRequest
-	logger          zerolog.Logger
-	invoicingPolicy domain.InvoicingPolicy
+	baseURL   string
+	doRequest forDoingHttpRequest
+	logger    zerolog.Logger
 }
 
-func NewHTTPInvoiceSender(baseURL string, doRequest forDoingHttpRequest, logger zerolog.Logger, invoicingPolicy domain.InvoicingPolicy) httpInvoiceSender {
-	return httpInvoiceSender{baseURL: baseURL, doRequest: doRequest, logger: logger, invoicingPolicy: invoicingPolicy}
+func NewHTTPInvoiceSender(baseURL string, doRequest forDoingHttpRequest, logger zerolog.Logger) httpInvoiceSender {
+	return httpInvoiceSender{baseURL: baseURL, doRequest: doRequest, logger: logger}
 }
 
-func (s httpInvoiceSender) SendInvoiceOnPriceCalculated(event domain.PriceCalculated) error {
-	if !s.invoicingPolicy(event) {
+func (s httpInvoiceSender) Send(event domain.DomainEvent) error {
+	pc, ok := event.(domain.PriceCalculated)
+	if !ok {
 		return nil
 	}
 
 	payload := invoiceRequest{
-		Email:           event.Email,
-		InvoiceAmount:   event.PriceAmount,
-		InvoiceCurrency: event.PriceCurrency,
+		Email:           pc.Email,
+		InvoiceAmount:   pc.PriceAmount,
+		InvoiceCurrency: pc.PriceCurrency,
 	}
 
 	body, err := json.Marshal(payload)

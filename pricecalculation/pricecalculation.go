@@ -8,7 +8,7 @@ type ForGettingCustomerByPersonID func(personID string) (domain.Customer, error)
 type ForSavingVisitHistories func(*domain.VisitHistory) error
 type ForGettingVisitHistoriesByCustomerID func(customerID string) *domain.VisitHistory
 type ForResettingVisitHistories func()
-type ForPublishingPriceCalculated func(domain.PriceCalculated) error
+type ForPublishingDomainEvents func(domain.DomainEvent) error
 
 type RawDroppedFraction struct {
 	Type     string
@@ -27,7 +27,7 @@ type PriceCalculator struct {
 	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID
 	saveVisitHistory            ForSavingVisitHistories
 	fractionPricingPolicy       domain.FractionPricingPolicy
-	publishPriceCalculated      ForPublishingPriceCalculated
+	publishDomainEvent          ForPublishingDomainEvents
 }
 
 func NewPriceCalculator(
@@ -35,9 +35,9 @@ func NewPriceCalculator(
 	getVisitHistoryByCustomerID ForGettingVisitHistoriesByCustomerID,
 	saveVisitHistory ForSavingVisitHistories,
 	fractionPricingPolicy domain.FractionPricingPolicy,
-	publishPriceCalculated ForPublishingPriceCalculated,
+	publishDomainEvent ForPublishingDomainEvents,
 ) PriceCalculator {
-	return PriceCalculator{getCustomerByPersonID, getVisitHistoryByCustomerID, saveVisitHistory, fractionPricingPolicy, publishPriceCalculated}
+	return PriceCalculator{getCustomerByPersonID, getVisitHistoryByCustomerID, saveVisitHistory, fractionPricingPolicy, publishDomainEvent}
 }
 
 func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fractions []RawDroppedFraction) (CalculatedPrice, error) {
@@ -74,7 +74,7 @@ func (c PriceCalculator) CalculatePrice(personID, visitID, date string, fraction
 		email = bc.Email()
 	}
 
-	if err := c.publishPriceCalculated(domain.PriceCalculated{
+	if err := c.publishDomainEvent(domain.PriceCalculated{
 		PersonID:      personID,
 		VisitID:       visitID,
 		CustomerType:  customer.Type(),

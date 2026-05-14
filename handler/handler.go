@@ -16,7 +16,7 @@ type Handler struct {
 	getVisitHistoryByCustomerID pricecalculation.ForGettingVisitHistoriesByCustomerID
 	saveVisitHistory            pricecalculation.ForSavingVisitHistories
 	fractionPricingPolicy       domain.FractionPricingPolicy
-	publishPriceCalculated      pricecalculation.ForPublishingPriceCalculated
+	publishDomainEvent          pricecalculation.ForPublishingDomainEvents
 }
 
 func NewHandler(
@@ -26,7 +26,7 @@ func NewHandler(
 	getVisitHistoryByCustomerID pricecalculation.ForGettingVisitHistoriesByCustomerID,
 	saveVisitHistory pricecalculation.ForSavingVisitHistories,
 	fractionPricingPolicy domain.FractionPricingPolicy,
-	publishPriceCalculated pricecalculation.ForPublishingPriceCalculated,
+	publishDomainEvent pricecalculation.ForPublishingDomainEvents,
 ) *Handler {
 	return &Handler{
 		logger:                      logger,
@@ -35,6 +35,6 @@ func NewHandler(
 		getVisitHistoryByCustomerID: getVisitHistoryByCustomerID,
 		saveVisitHistory:            saveVisitHistory,
 		fractionPricingPolicy:       fractionPricingPolicy,
-		publishPriceCalculated:      publishPriceCalculated,
+		publishDomainEvent:          publishDomainEvent,
 	}
 }

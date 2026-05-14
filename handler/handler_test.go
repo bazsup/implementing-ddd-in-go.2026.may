@@ -19,4 +19,4 @@ var dummySaveVisitHistory = func(*domain.VisitHistory) error { return nil }
 
 var dummyFractionPricingPolicy = domain.DefaultFractionPricingPolicy
 
-var dummyPublishPriceCalculated = func(domain.PriceCalculated) error { return nil }
+var dummyPublishDomainEvent = func(domain.DomainEvent) error { return nil }
